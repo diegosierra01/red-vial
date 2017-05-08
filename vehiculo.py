@@ -72,6 +72,8 @@ class Vehiculo:
                 self.frenar()
             else:
                 self.cambiarCarril()
+        else:
+            self.acelerar()
 
         # self.velocidad = self.velocidadOriginal
         self.posicion = self.posicion + self.velocidad
@@ -80,6 +82,9 @@ class Vehiculo:
         self.velocidad[0] = self.velocidad[0] / float(2)
         if self.velocidad[0] < 1:
             self.velocidad[0] = 1
+
+    def acelerar(self):
+        self.velocidad[0] = self.velocidad[0] + random.randrange(0, 1)
 
     def cambiarCarril(self):
         if self.carril == 2:  # Esta en el inferior hay que cambiar
