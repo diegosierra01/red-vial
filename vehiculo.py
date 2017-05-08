@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import random
+import cmath
 import math
 from Tkinter import *
 import threading
@@ -43,7 +44,7 @@ class Simulador:
 class Vehiculo:
 
     dibujo = None  # Es la referencia del dibujo que pertenece a esta particula en el canvas
-    distanciaPrudente = 5
+    angle = 0
 
     def __init__(self, via, vehiculos, limiteVentana):
         self.height = random.randrange(30, 80)
@@ -55,6 +56,8 @@ class Vehiculo:
         self.setPosicion()
         self.velocidad = np.array([random.randrange(1, 4), 0])  # Velocidad en Y = 0
         self.velocidadOriginal = self.velocidad
+        # depende de la velocidad
+        self.distanciaPrudente = 10
         self.color = ("#%03x" % random.randint(0, 0xFFF))  # Aleatorio Hexadecimal
         # print self.coordenadas
 
@@ -63,10 +66,9 @@ class Vehiculo:
             y = self.via['limiteSuperior'] + ((self.via['divisionCarriles'] - self.via['limiteSuperior']) / 2)
         else:
             y = self.via['divisionCarriles'] + ((self.via['limiteInferior'] - self.via['divisionCarriles']) / 2)
-        self.posicion = np.array([-self.width, y])
+        self.posicion = np.array([-self.height, y])
 
     def mover(self):
-
         if self.verificarAdelante() is False:  # hay un veliculo adelante
             if self.verificarLateral() is True:  # hay un vehiculo en el otro carril
                 self.frenar()
@@ -88,11 +90,21 @@ class Vehiculo:
 
     def cambiarCarril(self):
         if self.carril == 2:  # Esta en el inferior hay que cambiar
-            y = self.via['limiteSuperior'] + ((self.via['divisionCarriles'] - self.via['limiteSuperior']) / 2)
-            self.carril = 1
+            if self.posicion[1] > self.via['limiteSuperior'] + ((self.via['divisionCarriles'] - self.via['limiteSuperior']) / 2):
+                y = self.posicion[1] - 3
+                self.angle = 130
+            else:
+                self.carril = 1
+                self.angle = 0
+                y = self.posicion[1]
         else:  # Esta en el superior hay que cambiar
-            y = self.via['divisionCarriles'] + ((self.via['limiteInferior'] - self.via['divisionCarriles']) / 2)
-            self.carril = 2
+            if self.posicion[1] < self.via['divisionCarriles'] + ((self.via['limiteInferior'] - self.via['divisionCarriles']) / 2):
+                y = self.posicion[1] + 3
+                self.angle = 230
+            else:
+                self.carril = 2
+                self.angle = 0
+                y = self.posicion[1]
         self.posicion = np.array([self.posicion[0], y])
 
     def verificarAdelante(self):
@@ -175,7 +187,18 @@ class Ventana:
             self.canvas.delete(particula.dibujo)  # Borra el dibujo anterior
 
             # Dibuja el circulo
-            dibujo = self.canvas.create_rectangle(x, y, x + particula.height, y + particula.width, fill=particula.color)
+            coord = x, y, x + particula.height, y + particula.width
+            xy = [(coord[0], coord[1]), (coord[0], coord[3]), (coord[2], coord[3]), (coord[2], coord[1])]
+            dibujo = self.canvas.create_polygon(xy, fill=particula.color)
+            angle = cmath.exp(math.radians(particula.angle) * 1j)
+            center = x + (particula.height / 2), y + (particula.width / 2)
+            offset = complex(center[0], center[1])
+            newxy = []
+            for x, y in xy:
+                v = angle * (complex(x, y) - offset) + offset
+                newxy.append(v.real)
+                newxy.append(v.imag)
+            self.canvas.coords(dibujo, *newxy)
             particula.setDibujo(dibujo)
 
     def mostrar(self):
