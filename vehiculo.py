@@ -22,7 +22,7 @@ class Simulador:
         for i in xrange(0, cantidadParticulas):
             vehiculo = Vehiculo(self.ventana.via, self.vehiculos, self.anchoVentana)
             self.vehiculos.append(vehiculo)
-            espera = np.random.poisson()
+            espera = np.random.uniform(0.1, 5)
             time.sleep(espera)
             pass
 
@@ -42,11 +42,12 @@ class Simulador:
 
 class Vehiculo:
 
-    diametro = 20
     dibujo = None  # Es la referencia del dibujo que pertenece a esta particula en el canvas
     distanciaPrudente = 5
 
     def __init__(self, via, vehiculos, limiteVentana):
+        self.height = random.randrange(30, 80)
+        self.width = 20
         self.limiteVentana = limiteVentana
         self.carril = random.randrange(1, 3)  # La vía tiene dos carriles
         self.via = via
@@ -62,7 +63,7 @@ class Vehiculo:
             y = self.via['limiteSuperior'] + ((self.via['divisionCarriles'] - self.via['limiteSuperior']) / 2)
         else:
             y = self.via['divisionCarriles'] + ((self.via['limiteInferior'] - self.via['divisionCarriles']) / 2)
-        self.posicion = np.array([0, y])
+        self.posicion = np.array([-self.width, y])
 
     def mover(self):
 
@@ -92,8 +93,8 @@ class Vehiculo:
     def verificarAdelante(self):
         for vehiculo in self.vehiculos:
             if self.carril == vehiculo.carril:
-                distancia = (vehiculo.posicion[0] - (self.posicion[0] + self.diametro))
-                if distancia <= self.distanciaPrudente and distancia > -1 * self.diametro:
+                distancia = (vehiculo.posicion[0] - (self.posicion[0] + self.height))
+                if distancia <= self.distanciaPrudente and distancia > -1 * self.height:
                     return False
         return True
 
@@ -103,17 +104,17 @@ class Vehiculo:
             if self.carril != vehiculo.carril:
                 x0 = self.posicion[0]
                 y0 = vehiculo.posicion[1]
-                R0 = self.diametro / float(2)
+                R0 = self.height / float(2)
 
                 x1 = vehiculo.posicion[0]
                 y1 = vehiculo.posicion[1]
-                R1 = vehiculo.diametro / float(2)
+                R1 = vehiculo.height / float(2)
 
                 # Delante
-                if x0 <= x1 <= x0 + self.diametro + self.distanciaPrudente:
+                if x0 <= x1 <= x0 + self.height + self.distanciaPrudente:
                     return True
                 # Atras
-                if x1 <= x0 <= x1 + vehiculo.diametro + self.distanciaPrudente:
+                if x1 <= x0 <= x1 + vehiculo.height + self.distanciaPrudente:
                     return True
 
         return resultado
@@ -122,11 +123,11 @@ class Vehiculo:
 
         x0 = self.posicion[0]
         y0 = self.posicion[1]
-        R0 = self.diametro / float(2)
+        R0 = self.height / float(2)
 
         x1 = vehiculo.posicion[0]
         y1 = vehiculo.posicion[1]
-        R1 = vehiculo.diametro / float(2)
+        R1 = vehiculo.height / float(2)
         return abs(R0 - R1) <= math.sqrt(pow((x0 - x1), 2) + pow((y0 - y1), 2)) <= (R0 + R1)
 
     # Para referenciar el dibujo en la pantalla
@@ -169,7 +170,7 @@ class Ventana:
             self.canvas.delete(particula.dibujo)  # Borra el dibujo anterior
 
             # Dibuja el circulo
-            dibujo = self.canvas.create_oval(x, y, x + particula.diametro, y + particula.diametro, fill=particula.color)
+            dibujo = self.canvas.create_rectangle(x, y, x + particula.height, y + particula.width, fill=particula.color)
             particula.setDibujo(dibujo)
 
     def mostrar(self):
