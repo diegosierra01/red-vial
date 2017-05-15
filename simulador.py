@@ -1,25 +1,45 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-import random
 import numpy as np
+import random
 import time
 import threading
 from vehiculo import Vehiculo
 from ventana import Ventana
+from ventana import Via
 
 
 class Simulador:
 
     anchoVentana = 1000
-    alturaVentana = 600
+    alturaVentana = 800
 
     def __init__(self):
-        self.ventana = Ventana({'ancho': self.anchoVentana, 'alto': self.alturaVentana})
+        self.generarVias()
+        self.ventana = Ventana({'ancho': self.anchoVentana, 'alto': self.alturaVentana}, self.vias)
+
+    def generarVias(self):
+        self.vias = []
+        x = random.randrange(100, 400, 100)
+        y = random.randrange(100, 400, 100)
+        via = Via(x, y)
+        self.vias.append(via)
+        if via.posicion == 1:
+            x = via.limiteInferior + random.randrange(100, 400, 100)
+        else:
+            y = via.limiteInferior + random.randrange(100, 400, 100)
+        while(x < self.anchoVentana and y < self.alturaVentana):
+            via = Via(x, y)
+            self.vias.append(via)
+            if via.posicion == 1:
+                x = via.limiteInferior + random.randrange(100, 400, 100)
+            else:
+                y = via.limiteInferior + random.randrange(100, 400, 100)
 
     def generar(self, cantidadParticulas=50):
         self.vehiculos = []
         for i in xrange(0, cantidadParticulas):
-            vehiculo = Vehiculo(self.ventana.via, self.vehiculos, self.anchoVentana)
+            vehiculo = Vehiculo(self.vias[random.randrange(0, len(self.vias))], self.vehiculos, self.anchoVentana)
             self.vehiculos.append(vehiculo)
             espera = np.random.uniform(0.1, 5)
             time.sleep(espera)

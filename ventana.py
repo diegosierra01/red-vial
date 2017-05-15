@@ -2,10 +2,13 @@
 # -*- coding: utf-8 -*-
 import cmath
 import math
+import random
 from Tkinter import *
 
+
 class Ventana:
-    def __init__(self, tamano):
+    def __init__(self, tamano, vias):
+        self.vias = vias
         self.tamano = tamano
         self.ventana = Tk()
         self.ventana.title('Vehiculos')
@@ -18,18 +21,16 @@ class Ventana:
         self.dibujarVias()
 
     def dibujarVias(self):
-        anchoVia = 100
-        # Se dibuja en la mitad
-        limiteSuperior = (self.tamano['alto'] / 2) - (anchoVia / 2)
-        limiteInferior = (self.tamano['alto'] / 2) + (anchoVia / 2)
-        lineaDivisionCarril = limiteSuperior + ((limiteInferior - limiteSuperior) / 2)
-        self.via = {'ancho': anchoVia, 'limiteSuperior': limiteSuperior, 'limiteInferior': limiteInferior, 'divisionCarriles': lineaDivisionCarril}
-
-        # Dibuja via
-        self.canvas.create_line(0, limiteSuperior, self.tamano['ancho'], limiteSuperior, width=2)
-        self.canvas.create_line(0, limiteInferior, self.tamano['ancho'], limiteInferior, width=2)
-
-        self.canvas.create_line(0, lineaDivisionCarril, self.tamano['ancho'], lineaDivisionCarril, width=1, fill='gray')
+        for x in xrange(0, len(self.vias)):
+            # Dibuja via
+            if self.vias[x].posicion == 1:
+                self.canvas.create_line(0, self.vias[x].limiteSuperior, self.tamano['ancho'], self.vias[x].limiteSuperior, width=2)
+                self.canvas.create_line(0, self.vias[x].limiteInferior, self.tamano['ancho'], self.vias[x].limiteInferior, width=2)
+                self.canvas.create_line(0, self.vias[x].divisionCarriles, self.tamano['ancho'], self.vias[x].divisionCarriles, width=1, fill='gray')
+            else:
+                self.canvas.create_line(self.vias[x].limiteSuperior, 0, self.vias[x].limiteSuperior, self.tamano['alto'], width=2)
+                self.canvas.create_line(self.vias[x].limiteInferior, 0, self.vias[x].limiteInferior, self.tamano['alto'], width=2)
+                self.canvas.create_line(self.vias[x].divisionCarriles, 0, self.vias[x].divisionCarriles, self.tamano['alto'], width=1, fill='gray')
 
     def dibujarOvalos(self, particulas):
         for particula in particulas:
@@ -55,3 +56,23 @@ class Ventana:
 
     def mostrar(self):
         self.ventana.mainloop()
+
+
+class Via:
+
+    def __init__(self, x, y):
+        # 1 -> horizontal 2 -> vertical
+        self.posicion = random.randrange(1, 3)
+        # 1 -> izq a der, arri a aba 2 -> der a izq, aba a arrib
+        self.sentido = random.randrange(1, 3)
+        if self.posicion == 1:
+            self.limiteSuperior = x
+        else:
+            self.limiteSuperior = y
+        self.ancho = random.randrange(1, 6)
+        try:
+            self.width = {1: 75, 2: 100, 3: 150, 4: 200, 5: 250}[self.ancho]
+        except KeyError:
+            self.width = 100
+        self.limiteInferior = self.limiteSuperior + self.width
+        self.divisionCarriles = self.limiteSuperior + (self.width / 2)
