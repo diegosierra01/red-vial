@@ -64,14 +64,15 @@ class Via:
         # 1 -> horizontal 2 -> vertical
         self.posicion = random.randrange(1, 3)
         # 1 -> izq a der, arri a aba 2 -> der a izq, aba a arrib
-        self.sentido = random.randrange(1, 3)
+        self.sentido1 = random.randrange(1, 3)
+        self.sentido2 = random.randrange(1, 3)
         if self.posicion == 1:
             self.limiteSuperior = x
         else:
             self.limiteSuperior = y
         self.ancho = random.randrange(1, 6)
         try:
-            self.width = {1: 75, 2: 100, 3: 150, 4: 200, 5: 250}[self.ancho]
+            self.width = {1: 75, 2: 100, 3: 125, 4: 150, 5: 175}[self.ancho]
         except KeyError:
             self.width = 100
         self.limiteInferior = self.limiteSuperior + self.width

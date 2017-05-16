@@ -20,26 +20,26 @@ class Simulador:
 
     def generarVias(self):
         self.vias = []
-        x = random.randrange(100, 400, 100)
-        y = random.randrange(100, 400, 100)
+        x = random.randrange(100, 300, 100)
+        y = random.randrange(100, 300, 100)
         via = Via(x, y)
         self.vias.append(via)
         if via.posicion == 1:
-            x = via.limiteInferior + random.randrange(100, 400, 100)
+            x = via.limiteInferior + random.randrange(100, 300, 100)
         else:
-            y = via.limiteInferior + random.randrange(100, 400, 100)
+            y = via.limiteInferior + random.randrange(100, 300, 100)
         while(x < self.anchoVentana and y < self.alturaVentana):
             via = Via(x, y)
             self.vias.append(via)
             if via.posicion == 1:
-                x = via.limiteInferior + random.randrange(100, 400, 100)
+                x = via.limiteInferior + random.randrange(100, 300, 100)
             else:
-                y = via.limiteInferior + random.randrange(100, 400, 100)
+                y = via.limiteInferior + random.randrange(100, 300, 100)
 
     def generar(self, cantidadParticulas=50):
         self.vehiculos = []
         for i in xrange(0, cantidadParticulas):
-            vehiculo = Vehiculo(self.vias[random.randrange(0, len(self.vias))], self.vehiculos, self.anchoVentana)
+            vehiculo = Vehiculo(self.vias[random.randrange(0, len(self.vias))], self.vehiculos, self.anchoVentana, self.alturaVentana)
             self.vehiculos.append(vehiculo)
             espera = np.random.uniform(0.1, 5)
             time.sleep(espera)
