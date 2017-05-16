@@ -64,5 +64,9 @@ def toMatrixAdyacencia(Grafo): # Weight adjacency matrix
 
     for y in xrange(tamano):
         for x in xrange(tamano):
-                matrix[y][x] = Grafo.getPeso(tags[y], tags[x])
+            auxPeso = str(Grafo.getPeso(tags[y], tags[x]))
+            if auxPeso == 'inf' or auxPeso == '0':
+                matrix[y][x] = 0
+            else:
+                matrix[y][x] = 1
     return (matrix, tags)
