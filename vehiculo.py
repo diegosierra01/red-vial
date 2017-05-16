@@ -54,9 +54,10 @@ class Vehiculo:
                 self.posicion = np.array([coord - (self.height / 2), self.altoVentana + self.height])
 
     def mover(self):
-        if self.verificarAdelante() is False:  # hay un veliculo adelante
+        adelante, velocidad = self.verificarAdelante()
+        if adelante is False:  # hay un veliculo adelante
             if self.verificarLateral() is True:  # hay un vehiculo en el otro carril
-                self.frenar()
+                self.frenar(velocidad)
             else:
                 self.cambiarCarril()
         else:
@@ -66,15 +67,15 @@ class Vehiculo:
         else:
             self.posicion = self.posicion - self.velocidad
 
-    def frenar(self):
+    def frenar(self, velocidad):
         if self.via.posicion == 1:
             self.velocidad[0] = self.velocidad[0] / float(2)
-            if self.velocidad[0] < 1:
-                self.velocidad[0] = 1
+            if self.velocidad[0] < velocidad[0]:
+                self.velocidad[0] = velocidad[0]
         else:
             self.velocidad[1] = self.velocidad[1] / float(2)
-            if self.velocidad[1] < 1:
-                self.velocidad[1] = 1
+            if self.velocidad[1] < velocidad[1]:
+                self.velocidad[1] = velocidad[1]
 
     def acelerar(self):
         if self.via.posicion == 1:
@@ -152,8 +153,8 @@ class Vehiculo:
                     else:
                         distancia = (self.posicion[1] - (vehiculo.posicion[1] + vehiculo.height))
                 if distancia <= self.distanciaPrudente and distancia > -1 * self.height:
-                    return False
-        return True
+                    return False, vehiculo.velocidad
+        return True, 0
 
     def verificarLateral(self):
         resultado = False
