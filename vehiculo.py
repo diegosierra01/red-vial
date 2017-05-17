@@ -146,7 +146,7 @@ class Vehiculo:
                     if self.via.posicion == 1:
                         distancia = (vehiculo.posicion[0] - (self.posicion[0] + self.height))
                     else:
-                        distancia = (vehiculo.posicion[1] - (self.posicion[1] + self.height))
+                        distancia = (vehiculo.posicion[0] - (self.posicion[1] + self.height))
                 else:
                     if self.via.posicion == 1:
                         distancia = (self.posicion[0] - (vehiculo.posicion[0] + vehiculo.height))
