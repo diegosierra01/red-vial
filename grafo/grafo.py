@@ -5,6 +5,7 @@ Implementación de grafo, tanto dirigido como no dirigido
 
 import random
 
+
 class Grafo:
     def __init__(self, nombre_='', dirigido=False):
         """
@@ -14,37 +15,37 @@ class Grafo:
         self.vertices = {}
         self.dirigido = dirigido
 
-    def __contains__(self, vertice): #Para usarlo: print "A" in Grafo
+    def __contains__(self, vertice):  # Para usarlo: print "A" in Grafo
         return (vertice in self.vertices)
 
-    def __str__(self): #Para usarlo: print Grafo
+    def __str__(self):  # Para usarlo: print Grafo
         def vertice2str(n):
             if n in self:
                 vertice_str = str(n) + " : " + str(self.vertices[n])
                 return vertice_str
             else:
                 return False
-                
-        grafo_str = "Grafo nombre: "+ self.nombre + "\n"
+
+        grafo_str = "Grafo nombre: " + self.nombre + "\n"
         if len(self) == 0:
             grafo_str += "- Grafo vacio -\n"
         else:
             for n in self.vertices:
                 grafo_str += vertice2str(n) + "\n"
         return grafo_str
-    
-    def __len__(self): #Para usarlo: len(Grafo)
+
+    def __len__(self):  # Para usarlo: len(Grafo)
         return len(self.vertices)
 
-    def __iter__(self):#Para usarlo: for i in iter(Grafo): print i
+    def __iter__(self):  # Para usarlo: for i in iter(Grafo): print i
         return iter(self.vertices.keys())
 
-    def agregarVertices(self, lista_vertices, G = None):
+    def agregarVertices(self, lista_vertices, G=None):
         for vertice in lista_vertices:
             self.agregar(vertice.nombre, G)
 
     def agregarArista(self, vertice1, vertice2, peso=1):
-        if vertice1 and vertice2:            
+        if vertice1 and vertice2:
             if not vertice1.nombre in self.vertices:
                 self.vertices[vertice1.nombre] = {}
             self.vertices[vertice1.nombre][vertice2.nombre] = peso
@@ -57,8 +58,8 @@ class Grafo:
             return True
         else:
             print 'no existe alguno de los 2 vertices'
-    
-    def agregar(self, n, G = None):
+
+    def agregar(self, n, G=None):
         if not n in self:
             self.vertices[n] = {}
 
@@ -69,31 +70,31 @@ class Grafo:
     def verticeAleatorio(self):
         n = random.choice(self.vertices.keys())
         return (n, self.vertices[n])
-    
-    def contarAristas(self, vertice=None): #se puede mencionar el vertice
+
+    def contarAristas(self, vertice=None):  # se puede mencionar el vertice
         if vertice:
             return len(self.vertices[vertice])
         else:
             if self.dirigido:
                 return sum(map(lambda x: len(self.vertices[x]), self.getVertices()))
             else:
-                return sum(map(lambda x: len(self.vertices[x]), self.getVertices()))/2
+                return sum(map(lambda x: len(self.vertices[x]), self.getVertices())) / 2
 
-    def grado(self, n = None):
+    def grado(self, n=None):
         return len(self.getAristas(n))
 
     def tamano(self):
         return len(self.vertices)
-        
+
     def peso(self):
         w = 0
         for n in self.vertices.values():
             w += sum(n.values())
         if not self.dirigido:
-            w = w/2
-            
+            w = w / 2
+
         return w
-    
+
     def getNombre(self):
         return self.nombre
 
@@ -103,7 +104,7 @@ class Grafo:
     def getPeso(self, n1, n2):
         """
         Obtiene el peso de un arco unido entre n1 y n2
-        
+
         si n1 y n2 son iguales, retorna 0
 
         Si n1 y n2 pertenecen al grafo, pero no son adyacentes, retorna Infinite
@@ -118,7 +119,7 @@ class Grafo:
             return float("inf")
         return False
 
-    def getAristas(self, n = None):
+    def getAristas(self, n=None):
         if n:
             if n in self:
                 return self.vertices[n]
@@ -127,9 +128,8 @@ class Grafo:
         aristas = []
         for n in self:
             for v in self.vertices[n]:
-                aristas.append( (n, v, self.vertices[n][v]) )
+                aristas.append((n, v, self.vertices[n][v]))
         return aristas
-
 
     def esDirigido(self):
         return self.dirigido
