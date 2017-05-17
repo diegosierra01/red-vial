@@ -15,7 +15,7 @@ class Grafo:
         self.dirigido = dirigido
 
     def __contains__(self, vertice): #Para usarlo: print "A" in Grafo
-        return (vertice in self.vertices)
+        return (vertice['key'] in self.vertices)
 
     def __str__(self): #Para usarlo: print Grafo
         def vertice2str(n):
