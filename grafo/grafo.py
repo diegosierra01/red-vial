@@ -15,7 +15,7 @@ class Grafo:
         self.dirigido = dirigido
 
     def __contains__(self, vertice): #Para usarlo: print "A" in Grafo
-        return (vertice['key'] in self.vertices)
+        return (vertice in self.vertices)
 
     def __str__(self): #Para usarlo: print Grafo
         def vertice2str(n):
@@ -40,20 +40,23 @@ class Grafo:
         return iter(self.vertices.keys())
 
     def agregarVertices(self, lista_vertices, G = None):
-        for n in lista_vertices:
-            self.agregar(n, G)
+        for vertice in lista_vertices:
+            self.agregar(vertice.nombre, G)
 
-    def agregarArista(self, n1, n2, peso=1):
-        if not n1 in self.vertices:
-            self.vertices[n1] = {}
-        self.vertices[n1][n2] = peso
+    def agregarArista(self, vertice1, vertice2, peso=1):
+        if vertice1 and vertice2:            
+            if not vertice1.nombre in self.vertices:
+                self.vertices[vertice1.nombre] = {}
+            self.vertices[vertice1.nombre][vertice2.nombre] = peso
 
-        if self.dirigido is False:
-            if not n2 in self.vertices:
-                self.vertices[n2] = {}
-            self.vertices[n2][n1] = peso
+            if self.dirigido is False:
+                if not vertice2.nombre in self.vertices:
+                    self.vertices[vertice2.nombre] = {}
+                self.vertices[vertice2.nombre][vertice1.nombre] = peso
 
-        return True
+            return True
+        else:
+            print 'no existe alguno de los 2 vertices'
     
     def agregar(self, n, G = None):
         if not n in self:
