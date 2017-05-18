@@ -19,11 +19,19 @@ class Ventana:
         # self.ventana.geometry("1000x500")
         self.ventana.geometry(str(tamano['ancho']) + "x" + str(tamano['alto']))
         # self.ventana.geometry(tamano['ancho'], tamano['alto'])
-        self.canvas = Canvas(width=tamano['ancho'], height=tamano['alto'], bg='white')
+        self.canvas = Canvas(width=tamano['ancho']-100, height=tamano['alto']-100, bg='white')
         self.canvas.pack(expand=YES, fill=BOTH)
         self.canvas.bind("<Button-1>", self.detectarClick)
         self.dibujos = []
         self.vias = [] # Aristas
+        b = Button(self.ventana, text="Crear vias", command=self.crearVias)
+        b.pack()
+
+    def crearVias(self):
+        print "silantro"
+
+
+
 
     def detectarClick(self, evento):
         #diametro = 20
@@ -52,8 +60,9 @@ class Ventana:
                 'y' : coordenadas['y'], 
                 'centro' : {'x' : centroNodoX, 'y' : centroNodoY}
                 }
-        self.agregarArista(nodo)
-        self.nodos.append(nodo)
+        aristaAgregada = self.agregarArista(nodo)
+        if aristaAgregada:
+            self.nodos.append(nodo)
 
 
     # El ultimo agregado es el nodo de inicio el nodo que llega por parametro,
@@ -76,8 +85,11 @@ class Ventana:
             if not self.existeArista(arista):
                 self.vias.append(arista)
                 self.canvas.create_line(xInicio, yInicio, xFin, yFin, fill="black", width=2)
+                return True 
             else:
                 print 'Arista ya existe'
+                return False
+        return True
 
     def existeArista(self,arista):        
         aristaInvertida = {
@@ -101,6 +113,7 @@ class Ventana:
                 dibujo = self.canvas.create_oval(x , y, x + self.diametro, y + self.diametro, fill='red')
                 self.dibujos.append({'x':x,'y':y})
             pass
+        
 
     def mostrar(self):
         self.ventana.mainloop()
