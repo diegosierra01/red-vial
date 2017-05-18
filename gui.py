@@ -4,11 +4,13 @@ import cmath
 import math
 import random
 from Tkinter import *
+import numpy as np
 
 
 class Ventana:
 
     diametro = 20
+    nodos = []
 
     def __init__(self, tamano):
         self.tamano = tamano
@@ -21,23 +23,52 @@ class Ventana:
         self.canvas.pack(expand=YES, fill=BOTH)
         self.canvas.bind("<Button-1>", self.detectarClick)
         self.dibujos = []
-        self.via = []
+        self.vias = [] # Aristas
 
     def detectarClick(self, evento):
         #diametro = 20
         x = evento.x
         y = evento.y
         for dibujo in self.dibujos:
-            if (x>dibujo['x'] and x<dibujo['x'] + self.diametro) and (y>dibujo['y'] and y<dibujo['y'] + self.diametro):
-                self.via.append({'x':dibujo['x'], 'y':dibujo['y']})
-        if len(self.via)==2:
-            self.canvas.create_line(self.via[0]['x']+(self.diametro/2), self.via[0]['y']+(self.diametro/2), self.via[1]['x']+(self.diametro/2), self.via[1]['y']+(self.diametro/2), fill="black", width=2)
-            self.via = []
+            if (x>dibujo['x'] and x<dibujo['x'] + self.diametro) and (y>dibujo['y'] and y<dibujo['y'] + self.diametro):                
+                self.agregarNodo({'x':dibujo['x'], 'y':dibujo['y']})
+                #self.agregarNodo({'x':evento.x, 'y':evento.y})
+                break # Para que ya no revise mas
+        
+        #if len(self.via)==2:
+        #    self.canvas.create_line(self.via[0]['x']+(self.diametro/2), self.via[0]['y']+(self.diametro/2), self.via[1]['x']+(self.diametro/2), self.via[1]['y']+(self.diametro/2), fill="black", width=2)
+        #    self.via = []
 
-        #dibujo = self.canvas.create_oval(x, y, x + diametro, y + diametro, fill='red')
+        #dibujo = self.canvas.create_oval(x, y, x + diametro, y + diametro, fill='red') 
+    def agregarNodo(self, coordenadas):
+        centroNodoX = coordenadas['x'] + (self.diametro/2)
+        centroNodoY = coordenadas['y'] + (self.diametro/2)
+        nodo = {
+                'x' : coordenadas['x'], 
+                'y' : coordenadas['y'], 
+                'centro' : {'x' : centroNodoX, 'y' : centroNodoY}
+                }
+        self.agregarArista(nodo)
+        self.nodos.append(nodo)
+
+
+    # El ultimo agregado es el nodo de inicio el nodo que llega por parametro,
+    # es el nodo final
+    def agregarArista(self, nodo):
+        if(len(self.nodos) > 0):
+            ultimoAgregado = self.nodos[len(self.nodos)-1] 
+            
+            # Arista
+            xInicio = ultimoAgregado['centro']['x']
+            yInicio = ultimoAgregado['centro']['y']
+            xFin = nodo['centro']['x']
+            yFin = nodo['centro']['y']
+            self.canvas.create_line(xInicio, yInicio, xFin, yFin, fill="black", width=2)
+
+
 
     def dibujarNodos(self):
-        cantidadDivisiones = 20
+        cantidadDivisiones = 10
         distanciaDivisionesX = self.tamano['ancho'] / cantidadDivisiones
         distanciaDivisionesY = self.tamano['alto'] / cantidadDivisiones
 
@@ -50,8 +81,8 @@ class Ventana:
     def mostrar(self):
         self.ventana.mainloop()
 
-anchoVentana = 1000
-alturaVentana = 800
+anchoVentana = 800
+alturaVentana = 700
 ventana = Ventana({'ancho': anchoVentana, 'alto': alturaVentana})
 ventana.dibujarNodos()
 ventana.mostrar()
