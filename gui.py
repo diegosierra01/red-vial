@@ -28,9 +28,13 @@ class Ventana:
         b.pack()
 
     def crearVias(self):
-        print "silantro"
+        self.crearMatriz()
 
 
+    def crearMatriz(self): # Crear la matriz de adyacencia
+        self.matriz = np.zeros(len(self.nodos), len(self.nodos))
+        print self.matriz
+        return 1
 
 
     def detectarClick(self, evento):
@@ -56,6 +60,7 @@ class Ventana:
         centroNodoX = coordenadas['x'] + (self.diametro/2)
         centroNodoY = coordenadas['y'] + (self.diametro/2)
         nodo = {
+                'index' : len(self.nodos),
                 'x' : coordenadas['x'], 
                 'y' : coordenadas['y'], 
                 'centro' : {'x' : centroNodoX, 'y' : centroNodoY}
@@ -77,13 +82,17 @@ class Ventana:
             xFin = nodo['centro']['x']
             yFin = nodo['centro']['y']
             arista = {
+                    'indexInicio' : ultimoAgregado['index'],
+                    'indexFin' : nodo['index'],
                     'x' : xInicio,
                     'y' : yInicio,
                     'x2' : xFin,
                     'y2' : yFin
             }
-            if not self.existeArista(arista):
+            existeArista = self.existeArista(arista)
+            if not existeArista and ultimoAgregado['centro'] == nodo['centro']:
                 self.vias.append(arista)
+                # print self.vias
                 self.canvas.create_line(xInicio, yInicio, xFin, yFin, fill="black", width=2)
                 return True 
             else:
@@ -91,8 +100,10 @@ class Ventana:
                 return False
         return True
 
-    def existeArista(self,arista):        
+    def existeArista(self,arista):
         aristaInvertida = {
+                    'indexInicio' : arista['indexFin'],
+                    'indexFin' : arista['indexInicio'],
                     'x' : arista['x2'],
                     'y' : arista['y2'],
                     'x2' : arista['x'],
@@ -101,7 +112,11 @@ class Ventana:
         return self.estaRepetido(arista,aristaInvertida)
 
     def estaRepetido(self,arista,aristaInvertida):
-        return (arista in self.vias or aristaInvertida in self.vias)
+        #return (arista in self.vias or aristaInvertida in self.vias)
+        for via in self.vias:
+            if ( (via['x'] == arista['x'] and via['y'] == arista['y']) or 
+            (via['x'] == aristaInvertida['x'] and via['y'] == aristaInvertida['y'])):
+                return True
 
     def dibujarNodos(self):
         cantidadDivisiones = 10
