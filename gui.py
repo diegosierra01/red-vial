@@ -30,7 +30,7 @@ class Ventana:
         x = evento.x
         y = evento.y
         for dibujo in self.dibujos:
-            if (x>dibujo['x'] and x<dibujo['x'] + self.diametro) and (y>dibujo['y'] and y<dibujo['y'] + self.diametro):                
+            if (self.estaRangoCirculo(x,y,dibujo)):                
                 self.agregarNodo({'x':dibujo['x'], 'y':dibujo['y']})
                 #self.agregarNodo({'x':evento.x, 'y':evento.y})
                 break # Para que ya no revise mas
@@ -40,6 +40,10 @@ class Ventana:
         #    self.via = []
 
         #dibujo = self.canvas.create_oval(x, y, x + diametro, y + diametro, fill='red') 
+
+    def estaRangoCirculo(self, x,y,dibujo):
+        return (x>dibujo['x'] and x<dibujo['x'] + self.diametro) and (y>dibujo['y'] and y<dibujo['y'] + self.diametro)
+
     def agregarNodo(self, coordenadas):
         centroNodoX = coordenadas['x'] + (self.diametro/2)
         centroNodoY = coordenadas['y'] + (self.diametro/2)
@@ -63,9 +67,29 @@ class Ventana:
             yInicio = ultimoAgregado['centro']['y']
             xFin = nodo['centro']['x']
             yFin = nodo['centro']['y']
-            self.canvas.create_line(xInicio, yInicio, xFin, yFin, fill="black", width=2)
+            arista = {
+                    'x' : xInicio,
+                    'y' : yInicio,
+                    'x2' : xFin,
+                    'y2' : yFin
+            }
+            if not self.existeArista(arista):
+                self.vias.append(arista)
+                self.canvas.create_line(xInicio, yInicio, xFin, yFin, fill="black", width=2)
+            else:
+                print 'Arista ya existe'
 
+    def existeArista(self,arista):        
+        aristaInvertida = {
+                    'x' : arista['x2'],
+                    'y' : arista['y2'],
+                    'x2' : arista['x'],
+                    'y2' : arista['y']
+            }
+        return self.estaRepetido(arista,aristaInvertida)
 
+    def estaRepetido(self,arista,aristaInvertida):
+        return (arista in self.vias or aristaInvertida in self.vias)
 
     def dibujarNodos(self):
         cantidadDivisiones = 10
