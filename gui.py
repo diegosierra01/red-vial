@@ -22,8 +22,16 @@ class Ventana:
         self.canvas = Canvas(width=tamano['ancho'], height=tamano['alto'], bg='white')
         self.canvas.pack(expand=YES, fill=BOTH)
         self.canvas.bind("<Button-1>", self.detectarClick)
+        self.boton = Button(self.ventana, text="GUARDAR RED VIAL", width=tamano['ancho'], command=self.guardarRedVial, bg='green')
+        self.boton.pack()
         self.dibujos = []
         self.vias = [] # Aristas
+
+    def guardarRedVial(self):
+        print '*********** NODOS ***************'
+        print self.nodos
+        print '*********** VIAS ***************'
+        print self.vias
 
     def detectarClick(self, evento):
         #diametro = 20
@@ -92,7 +100,7 @@ class Ventana:
         return (arista in self.vias or aristaInvertida in self.vias)
 
     def dibujarNodos(self):
-        cantidadDivisiones = 10
+        cantidadDivisiones = 8
         distanciaDivisionesX = self.tamano['ancho'] / cantidadDivisiones
         distanciaDivisionesY = self.tamano['alto'] / cantidadDivisiones
 
@@ -105,8 +113,8 @@ class Ventana:
     def mostrar(self):
         self.ventana.mainloop()
 
-anchoVentana = 800
-alturaVentana = 700
+anchoVentana = 1300
+alturaVentana = 680
 ventana = Ventana({'ancho': anchoVentana, 'alto': alturaVentana})
 ventana.dibujarNodos()
 ventana.mostrar()
