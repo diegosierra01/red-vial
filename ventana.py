@@ -7,8 +7,8 @@ from Tkinter import *
 
 from gui import *
 
+
 class Ventana:
-    
 
     def __init__(self, tamano, vias):
         self.vias = vias
@@ -23,12 +23,9 @@ class Ventana:
 
         self.dibujarVias()
 
-
     def __init__(self, tamano):
         self.tamano = tamano
-        self.crearDesdeGrafo() #Crea las vías a partir del grafo
-
-        
+        self.crearDesdeGrafo()  # Crea las vías a partir del grafo
 
     def inicializar(self):
         self.ventanaPrincipal = Tk()
@@ -38,8 +35,6 @@ class Ventana:
         # self.ventana.geometry(tamano['ancho'], tamano['alto'])
         self.canvasPrincipal = Canvas(width=self.tamano['ancho'], height=self.tamano['alto'], bg='white')
         self.canvasPrincipal.pack(expand=YES, fill=BOTH)
-
-
 
     def dibujarVias(self):
         for x in xrange(0, len(self.vias)):
@@ -78,8 +73,6 @@ class Ventana:
     def mostrar(self):
         self.ventanaPrincipal.mainloop()
 
-
-        
     def crearDesdeGrafo(self):
         gui = Gui(self.tamano)
         gui.dibujarNodos()
@@ -90,12 +83,12 @@ class Ventana:
     def crearVias(self, aristas):
         for arista in aristas:
             via = Via(arista)
-            self.canvasPrincipal.create_line(via.divisionInicio['x'], via.divisionInicio['y'], via.divisionFin['x'], via.divisionFin['y'], width=1, fill='gray')        
-
+            self.canvasPrincipal.create_line(via.divisionInicio['x'], via.divisionInicio['y'], via.divisionFin['x'], via.divisionFin['y'], width=1, fill='blue')
+            self.canvasPrincipal.create_line(via.limiteSuperior['x1'], via.limiteSuperior['y1'], via.limiteSuperior['x2'], via.limiteSuperior['y2'], width=1, fill='red')
+            self.canvasPrincipal.create_line(via.limiteInferior['x1'], via.limiteInferior['y1'], via.limiteInferior['x2'], via.limiteInferior['y2'], width=1, fill='blue')
 
 
 class Via:
-
 
     def __init__(self, x, y):
         # 1 -> horizontal 2 -> vertical
@@ -115,18 +108,38 @@ class Via:
         self.limiteInferior = self.limiteSuperior + self.width
         self.divisionCarriles = self.limiteSuperior + (self.width / 2)
 
-                        # De la clase Arista
+        # De la clase Arista
     def __init__(self, lineaDivision):
         self.posicion = 3
         self.divisionInicio = lineaDivision.vertice1.position
         self.divisionFin = lineaDivision.vertice2.position
+        self.ancho = random.randrange(1, 6)
+        self.limiteSuperior = {}
+        self.limiteInferior = {}
+        try:
+            self.width = {1: 75, 2: 100, 3: 125, 4: 150, 5: 175}[self.ancho]
+        except KeyError:
+            self.width = 100
+        if self.divisionInicio['x'] == self.divisionFin['x']:
+            self.limiteSuperior['x1'] = self.divisionInicio['x'] + (self.width / 2)
+            self.limiteSuperior['x2'] = self.divisionInicio['x'] + (self.width / 2)
+            self.limiteSuperior['y1'] = self.divisionInicio['y']
+            self.limiteSuperior['y2'] = self.divisionFin['y']
+            self.limiteInferior['x1'] = self.divisionInicio['x'] + self.width
+            self.limiteInferior['x2'] = self.divisionInicio['x'] + self.width
+            self.limiteInferior['y1'] = self.divisionInicio['y']
+            self.limiteInferior['y2'] = self.divisionFin['y']
+        elif self.divisionInicio['y'] == self.divisionFin['y']:
+            self.limiteSuperior['y1'] = self.divisionInicio['y'] + (self.width / 2)
+            self.limiteSuperior['y2'] = self.divisionInicio['y'] + (self.width / 2)
+            self.limiteSuperior['x1'] = self.divisionInicio['x']
+            self.limiteSuperior['x2'] = self.divisionFin['x']
+            self.limiteInferior['y1'] = self.divisionInicio['y'] + self.width
+            self.limiteInferior['y2'] = self.divisionInicio['y'] + self.width
+            self.limiteInferior['x1'] = self.divisionInicio['x']
+            self.limiteInferior['x2'] = self.divisionFin['x']
 
-
-
-
-
-
-anchoVentana = 800 #1300
+anchoVentana = 800  # 1300
 alturaVentana = 680
 ventana = Ventana({'ancho': anchoVentana, 'alto': alturaVentana})
 ventana.mostrar()
