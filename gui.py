@@ -5,12 +5,18 @@ import math
 import random
 from Tkinter import *
 import numpy as np
+from arista import *
+from aristas import *
+from vertice import *
+from vertices import *
 
 
 class Ventana:
 
     diametro = 20
     nodos = []
+    vertices = Vertices()
+    aristas = Aristas()
 
     def __init__(self, tamano):
         self.tamano = tamano
@@ -25,13 +31,18 @@ class Ventana:
         self.boton = Button(self.ventana, text="GUARDAR RED VIAL", width=tamano['ancho'], command=self.guardarRedVial, bg='green')
         self.boton.pack()
         self.dibujos = []
-        self.vias = [] # Aristas
+        
 
     def guardarRedVial(self):
+        
         print '*********** NODOS ***************'
-        print self.nodos
+        nombre = 1
+        for vertice in self.vertices:
+            print vertice.position
+            #vertices.agregar(Vertice(str(nombre), {'x': nodo['x'], 'y': nodo['y']}, 20))
         print '*********** VIAS ***************'
-        print self.vias
+        for arista in self.aristas:
+            print 'arista:'+str(arista.vertice1.position)+' - '+str(arista.vertice2.position)+' - distancia: '+str(arista.distancia)
 
     def detectarClick(self, evento):
         #diametro = 20
@@ -39,8 +50,8 @@ class Ventana:
         y = evento.y
         for dibujo in self.dibujos:
             if (self.estaRangoCirculo(x,y,dibujo)):                
-                self.agregarNodo({'x':dibujo['x'], 'y':dibujo['y']})
-                #self.agregarNodo({'x':evento.x, 'y':evento.y})
+                self.agregarVertice({'x':dibujo['x'], 'y':dibujo['y']})
+                #self.agregarVertice({'x':evento.x, 'y':evento.y})
                 break # Para que ya no revise mas
         
         #if len(self.via)==2:
@@ -52,52 +63,33 @@ class Ventana:
     def estaRangoCirculo(self, x,y,dibujo):
         return (x>dibujo['x'] and x<dibujo['x'] + self.diametro) and (y>dibujo['y'] and y<dibujo['y'] + self.diametro)
 
-    def agregarNodo(self, coordenadas):
-        centroNodoX = coordenadas['x'] + (self.diametro/2)
-        centroNodoY = coordenadas['y'] + (self.diametro/2)
-        nodo = {
-                'x' : coordenadas['x'], 
-                'y' : coordenadas['y'], 
-                'centro' : {'x' : centroNodoX, 'y' : centroNodoY}
+    def agregarVertice(self, coordenadas):
+        position = {
+                'x' : coordenadas['x']+(self.diametro/2), 
+                'y' : coordenadas['y']+(self.diametro/2), 
                 }
-        self.agregarArista(nodo)
-        self.nodos.append(nodo)
+        
+        vertice = Vertice(str(len(self.vertices)+1),position)
+        self.agregarArista(vertice)
+        if len(self.aristas)==0:
+            self.vertices.agregar(vertice)
 
 
     # El ultimo agregado es el nodo de inicio el nodo que llega por parametro,
     # es el nodo final
-    def agregarArista(self, nodo):
-        if(len(self.nodos) > 0):
-            ultimoAgregado = self.nodos[len(self.nodos)-1] 
-            
-            # Arista
-            xInicio = ultimoAgregado['centro']['x']
-            yInicio = ultimoAgregado['centro']['y']
-            xFin = nodo['centro']['x']
-            yFin = nodo['centro']['y']
-            arista = {
-                    'x' : xInicio,
-                    'y' : yInicio,
-                    'x2' : xFin,
-                    'y2' : yFin
-            }
-            if not self.existeArista(arista):
-                self.vias.append(arista)
-                self.canvas.create_line(xInicio, yInicio, xFin, yFin, fill="black", width=2)
+    def agregarArista(self, vertice):
+        if(len(self.vertices) > 0):
+            ultimoVertice = self.vertices.obtenerUltimoAgregado()
+            arista = Arista(vertice,ultimoVertice)
+            if not self.aristas.existeArista(arista):
+                self.aristas.agregar(arista)
+                self.canvas.create_line(arista.vertice1.position['x'], arista.vertice1.position['y'], arista.vertice2.position['x'], arista.vertice2.position['y'], fill="black", width=2)
+                self.vertices.agregar(vertice)
+                print 'Arista pintada'
             else:
                 print 'Arista ya existe'
 
-    def existeArista(self,arista):        
-        aristaInvertida = {
-                    'x' : arista['x2'],
-                    'y' : arista['y2'],
-                    'x2' : arista['x'],
-                    'y2' : arista['y']
-            }
-        return self.estaRepetido(arista,aristaInvertida)
-
-    def estaRepetido(self,arista,aristaInvertida):
-        return (arista in self.vias or aristaInvertida in self.vias)
+    
 
     def dibujarNodos(self):
         cantidadDivisiones = 8

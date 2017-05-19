@@ -2,7 +2,7 @@
 
 
 class Vertice:
-    def __init__(self, nombre, position, centro):
+    def __init__(self, nombre, position):
         self.nombre = nombre
         self.position = position
-        self.centro = centro
+    
