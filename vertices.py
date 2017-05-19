@@ -52,3 +52,11 @@ class Vertices:
             if vertice.position == position:
                 return True
         return False
+
+
+
+class Vertice:
+    def __init__(self, nombre, position):
+        self.nombre = nombre
+        self.position = position
+    

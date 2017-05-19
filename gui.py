@@ -5,13 +5,12 @@ import math
 import random
 from Tkinter import *
 import numpy as np
-from arista import *
-from aristas import *
-from vertice import *
+import imp#
+from aristas import *#
 from vertices import *
 
 
-class Ventana:
+class Gui:
 
     diametro = 20
     nodos = []
@@ -131,8 +130,9 @@ class Ventana:
     def mostrar(self):
         self.ventana.mainloop()
 
+
 anchoVentana = 800 #1300
 alturaVentana = 680
-ventana = Ventana({'ancho': anchoVentana, 'alto': alturaVentana})
+ventana = Gui({'ancho': anchoVentana, 'alto': alturaVentana})
 ventana.dibujarNodos()
 ventana.mostrar()

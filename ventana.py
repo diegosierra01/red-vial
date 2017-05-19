@@ -5,6 +5,7 @@ import math
 import random
 from Tkinter import *
 
+from gui import *
 
 class Ventana:
     def __init__(self, tamano, vias):
@@ -77,3 +78,7 @@ class Via:
             self.width = 100
         self.limiteInferior = self.limiteSuperior + self.width
         self.divisionCarriles = self.limiteSuperior + (self.width / 2)
+
+
+
+Ventana({'ancho':99, 'alto': 40}, None)
