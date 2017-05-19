@@ -77,3 +77,13 @@ class Via:
             self.width = 100
         self.limiteInferior = self.limiteSuperior + self.width
         self.divisionCarriles = self.limiteSuperior + (self.width / 2)
+
+
+class Interseccion:
+
+    def __init__(self, x, y):
+        for via in vias:
+            if via.posicion == 1:
+                self.posicion[0] = self.via.divisionCarriles
+            else:
+                self.posicion[1] = self.via.divisionCarriles

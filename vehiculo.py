@@ -61,7 +61,10 @@ class Vehiculo:
             else:
                 self.cambiarCarril()
         else:
+            # if self.verificarInterseccion() is False:
             self.acelerar()
+            # else:
+            # self.frenar(np.array([0, 0]))
         if self.sentido == 1:
             self.posicion = self.posicion + self.velocidad
         else:
@@ -82,6 +85,16 @@ class Vehiculo:
             self.velocidad[0] = self.velocidad[0] + random.randrange(0, 1)
         else:
             self.velocidad[1] = self.velocidad[1] + random.randrange(0, 1)
+
+    def cambiarVia(self, via):
+        self.via = via
+        if self.via.posicion == 1:
+            if self.sentido == 1:
+                self.angle = 135
+                self.setPosicion()
+            else:
+                self.angle = 225
+                self.setPosicion()
 
     def cambiarCarril(self):
         if self.via.posicion == 1:
@@ -138,6 +151,26 @@ class Vehiculo:
                 self.angle = 90
                 x = self.posicion[0]
         self.posicion = np.array([x, self.posicion[1]])
+
+    def verificarInterseccion(self):
+        for vehiculo in self.vehiculos:
+            if self.via.posicion != vehiculo.via.posicion:
+                distancia = 10000
+                if self.via.posicion == 1:
+                    if (self.posicion[1] - vehiculo.posicion[1]) == vehiculo.height:
+                        if self.sentido == 1:
+                            distancia = (self.posicion[0] + self.height) - vehiculo.posicion[0]
+                        else:
+                            distancia = self.posicion[0] - vehiculo.posicion[0]
+                else:
+                    if (self.posicion[0] - vehiculo.posicion[0]) == vehiculo.height:
+                        if self.sentido == 1:
+                            distancia = (self.posicion[1] + self.height) - vehiculo.posicion[1]
+                        else:
+                            distancia = self.posicion[1] - vehiculo.posicion[1]
+                if abs(distancia) <= self.distanciaPrudente:
+                    return True
+        return False
 
     def verificarAdelante(self):
         for vehiculo in self.vehiculos:
