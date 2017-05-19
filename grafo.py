@@ -44,16 +44,16 @@ class Grafo:
         for vertice in lista_vertices:
             self.agregar(vertice.nombre, G)
 
-    def agregarArista(self, vertice1, vertice2, peso=1):
-        if vertice1 and vertice2:
-            if not vertice1.nombre in self.vertices:
-                self.vertices[vertice1.nombre] = {}
-            self.vertices[vertice1.nombre][vertice2.nombre] = peso
+    def agregarArista(self, arista):
+        if arista.vertice1 and arista.vertice2:
+            if not arista.vertice1.nombre in self.vertices:
+                self.vertices[arista.vertice1.nombre] = {}
+            self.vertices[arista.vertice1.nombre][arista.vertice2.nombre] = arista.distancia
 
             if self.dirigido is False:
-                if not vertice2.nombre in self.vertices:
-                    self.vertices[vertice2.nombre] = {}
-                self.vertices[vertice2.nombre][vertice1.nombre] = peso
+                if not arista.vertice2.nombre in self.vertices:
+                    self.vertices[arista.vertice2.nombre] = {}
+                self.vertices[arista.vertice2.nombre][arista.vertice1.nombre] = arista.distancia
 
             return True
         else:

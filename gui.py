@@ -5,12 +5,18 @@ import math
 import random
 from Tkinter import *
 import numpy as np
+from arista import *
+from aristas import *
+from vertice import *
+from vertices import *
 
 
 class Ventana:
 
     diametro = 20
     nodos = []
+    vertices = Vertices()
+    aristas = Aristas()
 
     def __init__(self, tamano):
         self.tamano = tamano
@@ -22,20 +28,38 @@ class Ventana:
         self.canvas = Canvas(width=tamano['ancho']-100, height=tamano['alto']-100, bg='white')
         self.canvas.pack(expand=YES, fill=BOTH)
         self.canvas.bind("<Button-1>", self.detectarClick)
+        #self.boton = Button(self.ventana, text="GUARDAR RED VIAL", width=tamano['ancho'], command=self.guardarRedVial, bg='green')
+        self.boton = Button(self.ventana, text="GUARDAR RED VIAL", command=self.guardarRedVial, bg='green')
+        self.boton.pack()
         self.dibujos = []
-        self.vias = [] # Aristas
-        b = Button(self.ventana, text="Crear vias", command=self.crearVias)
-        b.pack()
+       
 
-    def crearVias(self):
-        self.crearMatriz()
+    def guardarRedVial(self):
+        
+        print '*********** NODOS ***************'
+        nombre = 1
+        for vertice in self.vertices:
+            nombre = 1
+            print vertice.nombre
+            #vertices.agregar(Vertice(str(nombre), {'x': nodo['x'], 'y': nodo['y']}, 20))
+        print '*********** VIAS ***************'
+        for arista in self.aristas:
+            nombre = 1
+            #print 'arista:'+str(arista.vertice1.position)+' - '+str(arista.vertice2.position)+' - distancia: '+str(arista.distancia)
+            print 'arista:'+str(arista.vertice1.nombre)+' - '+str(arista.vertice2.nombre)+' - distancia: '+str(arista.distancia)
+        
+        self.generarMatriz()
 
 
-    def crearMatriz(self): # Crear la matriz de adyacencia
-        self.matriz = np.zeros(len(self.nodos), len(self.nodos))
+
+    def generarMatriz(self):
+        self.matriz = np.zeros( ( len( self.vertices.vertices ) , len( self.vertices.vertices))) # +1 de los nombres
         print self.matriz
-        return 1
-
+        for arista in self.aristas.aristas:
+            # Como es no dirigido, se agrega en ambos sentidos
+            self.matriz[arista.vertice1.nombre][arista.vertice2.nombre] = 1
+            self.matriz[arista.vertice2.nombre][arista.vertice1.nombre] = 1
+        print self.matriz
 
     def detectarClick(self, evento):
         #diametro = 20
@@ -43,8 +67,8 @@ class Ventana:
         y = evento.y
         for dibujo in self.dibujos:
             if (self.estaRangoCirculo(x,y,dibujo)):                
-                self.agregarNodo({'x':dibujo['x'], 'y':dibujo['y']})
-                #self.agregarNodo({'x':evento.x, 'y':evento.y})
+                self.agregarVertice({'x':dibujo['x'], 'y':dibujo['y']})
+                #self.agregarVertice({'x':evento.x, 'y':evento.y})
                 break # Para que ya no revise mas
         
         #if len(self.via)==2:
@@ -56,70 +80,44 @@ class Ventana:
     def estaRangoCirculo(self, x,y,dibujo):
         return (x>dibujo['x'] and x<dibujo['x'] + self.diametro) and (y>dibujo['y'] and y<dibujo['y'] + self.diametro)
 
-    def agregarNodo(self, coordenadas):
-        centroNodoX = coordenadas['x'] + (self.diametro/2)
-        centroNodoY = coordenadas['y'] + (self.diametro/2)
-        nodo = {
-                'index' : len(self.nodos),
-                'x' : coordenadas['x'], 
-                'y' : coordenadas['y'], 
-                'centro' : {'x' : centroNodoX, 'y' : centroNodoY}
+    def agregarVertice(self, coordenadas):
+        position = {
+                'x' : coordenadas['x']+(self.diametro/2), 
+                'y' : coordenadas['y']+(self.diametro/2), 
                 }
-        aristaAgregada = self.agregarArista(nodo)
-        if aristaAgregada:
-            self.nodos.append(nodo)
+        
+        #vertice = Vertice(str(len(self.vertices)+1),position)
+        vertice = Vertice((len(self.vertices)),position)
+        
+        if self.vertices.existeVertice(vertice.position): # Es un vetice ya agregado, se obtiene para no enviar uno nuevo con nombre diferente
+            print "existe"
+            vertice = self.vertices.obtenerConPosicion(vertice.position)
 
+        aristaAgregada = self.agregarArista(vertice)
+        if aristaAgregada :
+            self.vertices.agregar(vertice)
 
-    # El ultimo agregado es el nodo de inicio el nodo que llega por parametro,
-    # es el nodo final
-    def agregarArista(self, nodo):
-        if(len(self.nodos) > 0):
-            ultimoAgregado = self.nodos[len(self.nodos)-1] 
-            
-            # Arista
-            xInicio = ultimoAgregado['centro']['x']
-            yInicio = ultimoAgregado['centro']['y']
-            xFin = nodo['centro']['x']
-            yFin = nodo['centro']['y']
-            arista = {
-                    'indexInicio' : ultimoAgregado['index'],
-                    'indexFin' : nodo['index'],
-                    'x' : xInicio,
-                    'y' : yInicio,
-                    'x2' : xFin,
-                    'y2' : yFin
-            }
-            existeArista = self.existeArista(arista)
-            if not existeArista and ultimoAgregado['centro'] == nodo['centro']:
-                self.vias.append(arista)
-                # print self.vias
-                self.canvas.create_line(xInicio, yInicio, xFin, yFin, fill="black", width=2)
-                return True 
+    def agregarArista(self, vertice):
+        if(len(self.vertices) > 0):
+            #ultimoVertice = self.vertices.obtenerUltimoAgregado()
+            ultimoVertice = self.vertices.ultimoAgregado
+            #arista = Arista(vertice,ultimoVertice)
+            arista = Arista(ultimoVertice, vertice)
+            if not self.aristas.existeArista(arista) and ultimoVertice.position != vertice.position:
+                self.aristas.agregar(arista)
+                print arista.distancia
+                self.canvas.create_line(arista.vertice1.position['x'], arista.vertice1.position['y'], arista.vertice2.position['x'], arista.vertice2.position['y'], fill="black", width=2)
+                print 'Arista pintada'
+                return True
             else:
                 print 'Arista ya existe'
                 return False
-        return True
+        else:
+            return True
 
-    def existeArista(self,arista):
-        aristaInvertida = {
-                    'indexInicio' : arista['indexFin'],
-                    'indexFin' : arista['indexInicio'],
-                    'x' : arista['x2'],
-                    'y' : arista['y2'],
-                    'x2' : arista['x'],
-                    'y2' : arista['y']
-            }
-        return self.estaRepetido(arista,aristaInvertida)
-
-    def estaRepetido(self,arista,aristaInvertida):
-        #return (arista in self.vias or aristaInvertida in self.vias)
-        for via in self.vias:
-            if ( (via['x'] == arista['x'] and via['y'] == arista['y']) or 
-            (via['x'] == aristaInvertida['x'] and via['y'] == aristaInvertida['y'])):
-                return True
 
     def dibujarNodos(self):
-        cantidadDivisiones = 10
+        cantidadDivisiones = 8
         distanciaDivisionesX = self.tamano['ancho'] / cantidadDivisiones
         distanciaDivisionesY = self.tamano['alto'] / cantidadDivisiones
 
@@ -133,8 +131,8 @@ class Ventana:
     def mostrar(self):
         self.ventana.mainloop()
 
-anchoVentana = 800
-alturaVentana = 700
+anchoVentana = 800 #1300
+alturaVentana = 680
 ventana = Ventana({'ancho': anchoVentana, 'alto': alturaVentana})
 ventana.dibujarNodos()
 ventana.mostrar()
