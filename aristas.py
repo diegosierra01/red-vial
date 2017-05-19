@@ -31,9 +31,6 @@ class Aristas:
         return False
 
 
-
-
-
 class Arista:
     def __init__(self, vertice1, vertice2):
         self.vertice1 = vertice1
@@ -42,3 +39,5 @@ class Arista:
 
     def calcularDistancia(self):
         self.distancia = math.sqrt(pow((self.vertice2.position['x'] - self.vertice1.position['x']),2)+pow((self.vertice2.position['y'] - self.vertice1.position['y']),2))
+
+    def calcularAngulo(self): # Angulo con respecto a x

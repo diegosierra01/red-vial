@@ -8,6 +8,8 @@ from Tkinter import *
 from gui import *
 
 class Ventana:
+    
+
     def __init__(self, tamano, vias):
         self.vias = vias
         self.tamano = tamano
@@ -20,6 +22,24 @@ class Ventana:
         self.canvas.pack(expand=YES, fill=BOTH)
 
         self.dibujarVias()
+
+
+    def __init__(self, tamano):
+        self.tamano = tamano
+        self.crearDesdeGrafo() #Crea las vías a partir del grafo
+
+        
+
+    def inicializar(self):
+        self.ventanaPrincipal = Tk()
+        self.ventanaPrincipal.title('Vehiculos')
+        # self.ventana.geometry("1000x500")
+        self.ventanaPrincipal.geometry(str(self.tamano['ancho']) + "x" + str(self.tamano['alto']))
+        # self.ventana.geometry(tamano['ancho'], tamano['alto'])
+        self.canvasPrincipal = Canvas(width=self.tamano['ancho'], height=self.tamano['alto'], bg='white')
+        self.canvasPrincipal.pack(expand=YES, fill=BOTH)
+
+
 
     def dibujarVias(self):
         for x in xrange(0, len(self.vias)):
@@ -56,10 +76,26 @@ class Ventana:
             particula.setDibujo(dibujo)
 
     def mostrar(self):
-        self.ventana.mainloop()
+        self.ventanaPrincipal.mainloop()
+
+
+        
+    def crearDesdeGrafo(self):
+        gui = Gui(self.tamano)
+        gui.dibujarNodos()
+        gui.mostrar()
+        self.inicializar()
+        self.crearVias(gui.aristas.aristas)
+
+    def crearVias(self, aristas):
+        for arista in aristas:
+            via = Via(arista)
+            self.canvasPrincipal.create_line(via.divisionInicio['x'], via.divisionInicio['y'], via.divisionFin['x'], via.divisionFin['y'], width=1, fill='gray')        
+
 
 
 class Via:
+
 
     def __init__(self, x, y):
         # 1 -> horizontal 2 -> vertical
@@ -79,6 +115,18 @@ class Via:
         self.limiteInferior = self.limiteSuperior + self.width
         self.divisionCarriles = self.limiteSuperior + (self.width / 2)
 
+                        # De la clase Arista
+    def __init__(self, lineaDivision):
+        self.posicion = 3
+        self.divisionInicio = lineaDivision.vertice1.position
+        self.divisionFin = lineaDivision.vertice2.position
 
 
-Ventana({'ancho':99, 'alto': 40}, None)
+
+
+
+
+anchoVentana = 800 #1300
+alturaVentana = 680
+ventana = Ventana({'ancho': anchoVentana, 'alto': alturaVentana})
+ventana.mostrar()

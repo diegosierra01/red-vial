@@ -16,11 +16,12 @@ class Gui:
     nodos = []
     vertices = Vertices()
     aristas = Aristas()
+    matriz = np.zeros((0,0))
 
     def __init__(self, tamano):
         self.tamano = tamano
         self.ventana = Tk()
-        self.ventana.title('Vehiculos')
+        self.ventana.title('Grafo')
         # self.ventana.geometry("1000x500")
         self.ventana.geometry(str(tamano['ancho']) + "x" + str(tamano['alto']))
         # self.ventana.geometry(tamano['ancho'], tamano['alto'])
@@ -131,8 +132,8 @@ class Gui:
         self.ventana.mainloop()
 
 
-anchoVentana = 800 #1300
-alturaVentana = 680
-ventana = Gui({'ancho': anchoVentana, 'alto': alturaVentana})
-ventana.dibujarNodos()
-ventana.mostrar()
+#anchoVentana = 800 #1300
+#alturaVentana = 680
+#ventana = Gui({'ancho': anchoVentana, 'alto': alturaVentana})
+#ventana.dibujarNodos()
+#ventana.mostrar()
