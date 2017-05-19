@@ -11,7 +11,8 @@ from gui import *
 class Ventana:
 
     def __init__(self, tamano, vias):
-        self.vias = vias
+        self.vias = []
+        self.intersecciones = []
         self.tamano = tamano
         self.ventana = Tk()
         self.ventana.title('Vehiculos')
@@ -79,13 +80,24 @@ class Ventana:
         gui.mostrar()
         self.inicializar()
         self.crearVias(gui.aristas.aristas)
+        self.crearIntersecciones(gui.vertices.vertices)
 
     def crearVias(self, aristas):
         for arista in aristas:
             via = Via(arista)
-            self.canvasPrincipal.create_line(via.divisionInicio['x'], via.divisionInicio['y'], via.divisionFin['x'], via.divisionFin['y'], width=1, fill='blue')
-            self.canvasPrincipal.create_line(via.limiteSuperior['x1'], via.limiteSuperior['y1'], via.limiteSuperior['x2'], via.limiteSuperior['y2'], width=1, fill='red')
+            self.canvasPrincipal.create_line(via.divisionInicio['x'], via.divisionInicio['y'], via.divisionFin['x'], via.divisionFin['y'], width=1, fill='red')
+            self.canvasPrincipal.create_line(via.limiteSuperior['x1'], via.limiteSuperior['y1'], via.limiteSuperior['x2'], via.limiteSuperior['y2'], width=1, fill='blue')
             self.canvasPrincipal.create_line(via.limiteInferior['x1'], via.limiteInferior['y1'], via.limiteInferior['x2'], via.limiteInferior['y2'], width=1, fill='blue')
+            self.vias.append(via)
+
+    def crearIntersecciones(self, vertices):
+        for vertice in vertices:
+            adyacentes = []
+            for via in vias:
+                if vertice == via.arista.vertice1 or vertice == via.arista.vertice2:
+                    adyacentes.append(via)
+            interseccion = Interseccion(vertice, adyacentes)
+            intersecciones.append(interseccion)
 
 
 class Via:
@@ -111,6 +123,7 @@ class Via:
         # De la clase Arista
     def __init__(self, lineaDivision):
         self.posicion = 3
+        self.arista = lineaDivision
         self.divisionInicio = lineaDivision.vertice1.position
         self.divisionFin = lineaDivision.vertice2.position
         self.ancho = random.randrange(1, 6)
@@ -121,23 +134,40 @@ class Via:
         except KeyError:
             self.width = 100
         if self.divisionInicio['x'] == self.divisionFin['x']:
+            # Der a izq
+            self.posicion = 1
             self.limiteSuperior['x1'] = self.divisionInicio['x'] + (self.width / 2)
             self.limiteSuperior['x2'] = self.divisionInicio['x'] + (self.width / 2)
             self.limiteSuperior['y1'] = self.divisionInicio['y']
             self.limiteSuperior['y2'] = self.divisionFin['y']
-            self.limiteInferior['x1'] = self.divisionInicio['x'] + self.width
-            self.limiteInferior['x2'] = self.divisionInicio['x'] + self.width
+            self.limiteInferior['x1'] = self.divisionInicio['x'] - (self.width / 2)
+            self.limiteInferior['x2'] = self.divisionInicio['x'] - (self.width / 2)
             self.limiteInferior['y1'] = self.divisionInicio['y']
             self.limiteInferior['y2'] = self.divisionFin['y']
         elif self.divisionInicio['y'] == self.divisionFin['y']:
+            # Arr a aba
+            self.posicion = 2
             self.limiteSuperior['y1'] = self.divisionInicio['y'] + (self.width / 2)
             self.limiteSuperior['y2'] = self.divisionInicio['y'] + (self.width / 2)
             self.limiteSuperior['x1'] = self.divisionInicio['x']
             self.limiteSuperior['x2'] = self.divisionFin['x']
-            self.limiteInferior['y1'] = self.divisionInicio['y'] + self.width
-            self.limiteInferior['y2'] = self.divisionInicio['y'] + self.width
+            self.limiteInferior['y1'] = self.divisionInicio['y'] - (self.width / 2)
+            self.limiteInferior['y2'] = self.divisionInicio['y'] - (self.width / 2)
             self.limiteInferior['x1'] = self.divisionInicio['x']
             self.limiteInferior['x2'] = self.divisionFin['x']
+        else:
+            # diagonal
+            self.posicion = 3
+
+
+class Interseccion:
+
+    def __init__(self, vertice, vias):
+        self.vertice = vertice
+        for via in vias:
+            self.linea.append(9)
+            pass
+
 
 anchoVentana = 800  # 1300
 alturaVentana = 680
