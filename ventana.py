@@ -25,6 +25,8 @@ class Ventana:
         self.dibujarVias()
 
     def __init__(self, tamano):
+        self.vias = []
+        self.intersecciones = []
         self.tamano = tamano
         self.crearDesdeGrafo()  # Crea las vías a partir del grafo
 
@@ -37,7 +39,7 @@ class Ventana:
         self.canvasPrincipal = Canvas(width=self.tamano['ancho'], height=self.tamano['alto'], bg='white')
         self.canvasPrincipal.pack(expand=YES, fill=BOTH)
 
-    def dibujarVias(self):
+    def dibujarViasOld(self):
         for x in xrange(0, len(self.vias)):
             # Dibuja via
             if self.vias[x].posicion == 1:
@@ -85,19 +87,29 @@ class Ventana:
     def crearVias(self, aristas):
         for arista in aristas:
             via = Via(arista)
+            self.vias.append(via)
+
+    def dibujarVias(self):
+        for via in self.vias:
             self.canvasPrincipal.create_line(via.divisionInicio['x'], via.divisionInicio['y'], via.divisionFin['x'], via.divisionFin['y'], width=1, fill='red')
             self.canvasPrincipal.create_line(via.limiteSuperior['x1'], via.limiteSuperior['y1'], via.limiteSuperior['x2'], via.limiteSuperior['y2'], width=1, fill='blue')
             self.canvasPrincipal.create_line(via.limiteInferior['x1'], via.limiteInferior['y1'], via.limiteInferior['x2'], via.limiteInferior['y2'], width=1, fill='blue')
-            self.vias.append(via)
 
     def crearIntersecciones(self, vertices):
         for vertice in vertices:
             adyacentes = []
-            for via in vias:
+            for via in self.vias:
                 if vertice == via.arista.vertice1 or vertice == via.arista.vertice2:
                     adyacentes.append(via)
             interseccion = Interseccion(vertice, adyacentes)
-            intersecciones.append(interseccion)
+            self.intersecciones.append(interseccion)
+        self.dibujarVias()
+        self.dibujarIntersecciones()
+
+    def dibujarIntersecciones(self):
+        for interseccion in self.intersecciones:
+            if len(interseccion.coordenadas) > 1:
+                self.canvasPrincipal.create_rectangle(interseccion.coordenadas['x1'], interseccion.coordenadas['y1'], interseccion.coordenadas['x2'], interseccion.coordenadas['y2'])
 
 
 class Via:
@@ -164,9 +176,19 @@ class Interseccion:
 
     def __init__(self, vertice, vias):
         self.vertice = vertice
-        for via in vias:
-            self.linea.append(9)
-            pass
+        self.vias = vias
+        self.coordenadas = {}
+        print "hola"
+        if len(vias) > 1:
+            for via in vias:
+                # Vertical
+                if via.posicion == 1:
+                    self.coordenadas['x1'] = self.vertice.position['x'] + (via.width / 2)
+                    self.coordenadas['x2'] = self.vertice.position['x'] - (via.width / 2)
+                elif via.posicion == 2:
+                    self.coordenadas['y1'] = self.vertice.position['y'] + (via.width / 2)
+                    self.coordenadas['y2'] = self.vertice.position['y'] - (via.width / 2)
+            print self.coordenadas
 
 
 anchoVentana = 800  # 1300
