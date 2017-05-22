@@ -28,7 +28,11 @@ class Ventana:
         self.vias = []
         self.intersecciones = []
         self.tamano = tamano
-        self.crearDesdeGrafo()  # Crea las vías a partir del grafo
+        gui = Gui(self.tamano)
+        gui.dibujarNodos()
+        gui.mostrar()
+        self.crearVias(gui.aristas.aristas)
+        self.crearIntersecciones(gui.vertices.vertices)
 
     def inicializar(self):
         self.ventanaPrincipal = Tk()
@@ -38,6 +42,8 @@ class Ventana:
         # self.ventana.geometry(tamano['ancho'], tamano['alto'])
         self.canvasPrincipal = Canvas(width=self.tamano['ancho'], height=self.tamano['alto'], bg='white')
         self.canvasPrincipal.pack(expand=YES, fill=BOTH)
+        self.dibujarVias()
+        self.dibujarIntersecciones()
 
     def dibujarViasOld(self):
         for x in xrange(0, len(self.vias)):
@@ -56,12 +62,12 @@ class Ventana:
             x = particula.posicion[0]
             y = particula.posicion[1]
 
-            self.canvas.delete(particula.dibujo)  # Borra el dibujo anterior
+            self.canvasPrincipal.delete(particula.dibujo)  # Borra el dibujo anterior
 
             # Dibuja el circulo
             coord = x, y, x + particula.height, y + particula.width
             xy = [(coord[0], coord[1]), (coord[0], coord[3]), (coord[2], coord[3]), (coord[2], coord[1])]
-            dibujo = self.canvas.create_polygon(xy, fill=particula.color)
+            dibujo = self.canvasPrincipal.create_polygon(xy, fill=particula.color)
             angle = cmath.exp(math.radians(particula.angle) * 1j)
             center = x + (particula.height / 2), y + (particula.width / 2)
             offset = complex(center[0], center[1])
@@ -70,19 +76,11 @@ class Ventana:
                 v = angle * (complex(x, y) - offset) + offset
                 newxy.append(v.real)
                 newxy.append(v.imag)
-            self.canvas.coords(dibujo, *newxy)
+            self.canvasPrincipal.coords(dibujo, *newxy)
             particula.setDibujo(dibujo)
 
     def mostrar(self):
         self.ventanaPrincipal.mainloop()
-
-    def crearDesdeGrafo(self):
-        gui = Gui(self.tamano)
-        gui.dibujarNodos()
-        gui.mostrar()
-        self.inicializar()
-        self.crearVias(gui.aristas.aristas)
-        self.crearIntersecciones(gui.vertices.vertices)
 
     def crearVias(self, aristas):
         for arista in aristas:
@@ -101,15 +99,27 @@ class Ventana:
             for via in self.vias:
                 if vertice == via.arista.vertice1 or vertice == via.arista.vertice2:
                     adyacentes.append(via)
-            interseccion = Interseccion(vertice, adyacentes)
-            self.intersecciones.append(interseccion)
-        self.dibujarVias()
-        self.dibujarIntersecciones()
+            if len(adyacentes) > 1:
+                interseccion = Interseccion(vertice, adyacentes)
+                self.intersecciones.append(interseccion)
 
     def dibujarIntersecciones(self):
         for interseccion in self.intersecciones:
-            if len(interseccion.coordenadas) > 1:
+            if len(interseccion.coordenadas) > 3:
                 self.canvasPrincipal.create_rectangle(interseccion.coordenadas['x1'], interseccion.coordenadas['y1'], interseccion.coordenadas['x2'], interseccion.coordenadas['y2'])
+                for semaforo in interseccion.semaforos:
+                    if semaforo.via.posicion == 1:
+                        semaforo.setDibujo(self.canvasPrincipal.create_oval(semaforo.posicion['x'] - 20, semaforo.posicion['y'] - 10, semaforo.posicion['x'], semaforo.posicion['y'] + 10, fill=semaforo.color))
+                    elif semaforo.via.posicion == 2:
+                        semaforo.setDibujo(self.canvasPrincipal.create_oval(semaforo.posicion['x'] - 10, semaforo.posicion['y'] - 20, semaforo.posicion['x'] + 10, semaforo.posicion['y'], fill=semaforo.color))
+
+    def actualizarSemaforos(self):
+        for interseccion in self.intersecciones:
+            if len(interseccion.coordenadas) > 3:
+                for semaforo in interseccion.semaforos:
+                    semaforo.estado = not semaforo.estado
+                    semaforo.asignarColor()
+                    self.canvasPrincipal.itemconfig(semaforo.dibujo, fill=semaforo.color)
 
 
 class Via:
@@ -134,7 +144,10 @@ class Via:
 
         # De la clase Arista
     def __init__(self, lineaDivision):
-        self.posicion = 3
+        # self.sentido1 = random.randrange(1, 3)
+        # self.sentido2 = random.randrange(1, 3)
+        self.sentido1 = 1
+        self.sentido2 = 2
         self.arista = lineaDivision
         self.divisionInicio = lineaDivision.vertice1.position
         self.divisionFin = lineaDivision.vertice2.position
@@ -142,31 +155,31 @@ class Via:
         self.limiteSuperior = {}
         self.limiteInferior = {}
         try:
-            self.width = {1: 75, 2: 100, 3: 125, 4: 150, 5: 175}[self.ancho]
+            self.width = {1: 48, 2: 50, 3: 52, 4: 54, 5: 56}[self.ancho]
         except KeyError:
             self.width = 100
-        if self.divisionInicio['x'] == self.divisionFin['x']:
-            # Der a izq
-            self.posicion = 1
-            self.limiteSuperior['x1'] = self.divisionInicio['x'] + (self.width / 2)
-            self.limiteSuperior['x2'] = self.divisionInicio['x'] + (self.width / 2)
-            self.limiteSuperior['y1'] = self.divisionInicio['y']
-            self.limiteSuperior['y2'] = self.divisionFin['y']
-            self.limiteInferior['x1'] = self.divisionInicio['x'] - (self.width / 2)
-            self.limiteInferior['x2'] = self.divisionInicio['x'] - (self.width / 2)
-            self.limiteInferior['y1'] = self.divisionInicio['y']
-            self.limiteInferior['y2'] = self.divisionFin['y']
-        elif self.divisionInicio['y'] == self.divisionFin['y']:
+        if self.divisionInicio['y'] == self.divisionFin['y']:
             # Arr a aba
-            self.posicion = 2
-            self.limiteSuperior['y1'] = self.divisionInicio['y'] + (self.width / 2)
-            self.limiteSuperior['y2'] = self.divisionInicio['y'] + (self.width / 2)
+            self.posicion = 1
+            self.limiteSuperior['y1'] = self.divisionInicio['y'] - (self.width / 2)
+            self.limiteSuperior['y2'] = self.divisionInicio['y'] - (self.width / 2)
             self.limiteSuperior['x1'] = self.divisionInicio['x']
             self.limiteSuperior['x2'] = self.divisionFin['x']
-            self.limiteInferior['y1'] = self.divisionInicio['y'] - (self.width / 2)
-            self.limiteInferior['y2'] = self.divisionInicio['y'] - (self.width / 2)
+            self.limiteInferior['y1'] = self.divisionInicio['y'] + (self.width / 2)
+            self.limiteInferior['y2'] = self.divisionInicio['y'] + (self.width / 2)
             self.limiteInferior['x1'] = self.divisionInicio['x']
             self.limiteInferior['x2'] = self.divisionFin['x']
+        elif self.divisionInicio['x'] == self.divisionFin['x']:
+            # Der a izq
+            self.posicion = 2
+            self.limiteSuperior['x1'] = self.divisionInicio['x'] - (self.width / 2)
+            self.limiteSuperior['x2'] = self.divisionInicio['x'] - (self.width / 2)
+            self.limiteSuperior['y1'] = self.divisionInicio['y']
+            self.limiteSuperior['y2'] = self.divisionFin['y']
+            self.limiteInferior['x1'] = self.divisionInicio['x'] + (self.width / 2)
+            self.limiteInferior['x2'] = self.divisionInicio['x'] + (self.width / 2)
+            self.limiteInferior['y1'] = self.divisionInicio['y']
+            self.limiteInferior['y2'] = self.divisionFin['y']
         else:
             # diagonal
             self.posicion = 3
@@ -175,23 +188,59 @@ class Via:
 class Interseccion:
 
     def __init__(self, vertice, vias):
+        self.semaforos = []
         self.vertice = vertice
         self.vias = vias
         self.coordenadas = {}
-        print "hola"
-        if len(vias) > 1:
-            for via in vias:
-                # Vertical
-                if via.posicion == 1:
-                    self.coordenadas['x1'] = self.vertice.position['x'] + (via.width / 2)
-                    self.coordenadas['x2'] = self.vertice.position['x'] - (via.width / 2)
-                elif via.posicion == 2:
-                    self.coordenadas['y1'] = self.vertice.position['y'] + (via.width / 2)
-                    self.coordenadas['y2'] = self.vertice.position['y'] - (via.width / 2)
-            print self.coordenadas
+        for via in vias:
+            # Vertical
+            if via.posicion == 1:
+                self.coordenadas['y1'] = self.vertice.position['y'] + (via.width / 2)
+                self.coordenadas['y2'] = self.vertice.position['y'] - (via.width / 2)
+            elif via.posicion == 2:
+                self.coordenadas['x1'] = self.vertice.position['x'] + (via.width / 2)
+                self.coordenadas['x2'] = self.vertice.position['x'] - (via.width / 2)
+        print self.coordenadas
+        if len(self.coordenadas) > 3:
+            self.crearSemaforos()
+
+    def crearSemaforos(self):
+        viascubiertas = []
+        estado = True
+        while len(viascubiertas) < (len(self.vias) - 1):
+            numerorandom = random.randrange(0, len(self.vias) - 1)
+            valido = True
+            for numero in viascubiertas:
+                if numero == numerorandom:
+                    valido = False
+            if valido is True:
+                estado = not estado
+                semaforo = Semaforo(self.vias[numerorandom], self.coordenadas, estado)
+                self.semaforos.append(semaforo)
+                viascubiertas.append(numerorandom)
+            print str(len(viascubiertas))
 
 
-anchoVentana = 800  # 1300
-alturaVentana = 680
-ventana = Ventana({'ancho': anchoVentana, 'alto': alturaVentana})
-ventana.mostrar()
+class Semaforo:
+
+    def __init__(self, via, coord, estado):
+        # verde
+        self.via = via
+        self.posicion = {}
+        self.estado = estado
+        if via.posicion == 1:
+            self.posicion['x'] = coord['x2']
+            self.posicion['y'] = via.limiteSuperior['y1']
+        elif via.posicion == 2:
+            self.posicion['x'] = via.limiteSuperior['x1']
+            self.posicion['y'] = coord['y2']
+        self.asignarColor()
+
+    def asignarColor(self):
+        if self.estado is True:
+            self.color = 'green'
+        else:
+            self.color = 'red'
+
+    def setDibujo(self, dibujo):
+        self.dibujo = dibujo

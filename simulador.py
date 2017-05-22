@@ -12,11 +12,13 @@ from ventana import Via
 class Simulador:
 
     anchoVentana = 1000
-    alturaVentana = 800
+    alturaVentana = 700
 
     def __init__(self):
-        self.generarVias()
-        self.ventana = Ventana({'ancho': self.anchoVentana, 'alto': self.alturaVentana}, self.vias)
+        # self.generarVias()
+        self.ventana = Ventana({'ancho': self.anchoVentana, 'alto': self.alturaVentana})
+        # self.ventana.crearDesdeGrafo()
+        self.ventana.inicializar()
 
     def generarVias(self):
         self.vias = []
@@ -39,7 +41,7 @@ class Simulador:
     def generar(self, cantidadParticulas=50):
         self.vehiculos = []
         for i in xrange(0, cantidadParticulas):
-            vehiculo = Vehiculo(self.vias[random.randrange(0, len(self.vias))], self.vehiculos, self.anchoVentana, self.alturaVentana)
+            vehiculo = Vehiculo(self.ventana.vias[random.randrange(0, len(self.ventana.vias))], self.vehiculos, self.anchoVentana, self.alturaVentana)
             self.vehiculos.append(vehiculo)
             espera = np.random.uniform(0.1, 5)
             time.sleep(espera)
@@ -48,12 +50,16 @@ class Simulador:
     # ....Hilo.....
     def moverParticulas(self):
         while True:
-            self.ventana.dibujarVias()
             for x in xrange(0, len(self.vehiculos)):
                 self.vehiculos[x].mover()
                 pass
             self.ventana.dibujarOvalos(self.vehiculos)
             time.sleep(0.01)
+
+    def actualizarSemaforos(self):
+        while True:
+            self.ventana.actualizarSemaforos()
+            time.sleep(30)
 
     def mostrarVentana(self):
         self.ventana.mostrar()
@@ -69,5 +75,9 @@ hiloGenerador.start()
 hilo = threading.Thread(target=simulador.moverParticulas)
 hilo.daemon = True
 hilo.start()
+
+hilosem = threading.Thread(target=simulador.actualizarSemaforos)
+hilosem.daemon = True
+hilosem.start()
 
 simulador.mostrarVentana()

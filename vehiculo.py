@@ -38,16 +38,20 @@ class Vehiculo:
             self.sentido = self.via.sentido2
 
     def setPosicion(self):
-        if self.carril == 1:  # Carril superior
-            coord = self.via.limiteSuperior + (self.via.width / 4) - (self.width / 2)
-        else:
-            coord = self.via.divisionCarriles + (self.via.width / 4) - (self.width / 2)
         if self.via.posicion == 1:
+            if self.carril == 1:  # Carril superior
+                coord = self.via.limiteSuperior['y1'] + (self.via.width / 4) - (self.width / 2)
+            else:
+                coord = self.via.divisionInicio['y'] + (self.via.width / 4) - (self.width / 2)
             if self.sentido == 1:
                 self.posicion = np.array([-self.height, coord])
             else:
                 self.posicion = np.array([self.anchoVentana + self.height, coord])
         else:
+            if self.carril == 1:  # Carril superior
+                coord = self.via.limiteSuperior['x1'] + (self.via.width / 4)
+            else:
+                coord = self.via.divisionInicio['x'] + (self.via.width / 4)
             if self.sentido == 1:
                 self.posicion = np.array([coord - (self.height / 2), -self.height])
             else:
@@ -85,13 +89,13 @@ class Vehiculo:
 
     def cambiarCarril(self):
         if self.via.posicion == 1:
-            self.cambiarCarrilEsteOeste()
+            self.cambiarCarrilEsteOeste(self.via.limiteSuperior['y1'], self.via.divisionInicio['y'])
         else:
-            self.cambiarCarrilNorteSur()
+            self.cambiarCarrilNorteSur(self.via.limiteSuperior['x1'], self.via.divisionInicio['x'])
 
-    def cambiarCarrilEsteOeste(self):
+    def cambiarCarrilEsteOeste(self, limiteSuperior, divisionCarriles):
         if self.carril == 2:  # Esta en el inferior hay que cambiar
-            if self.posicion[1] > self.via.limiteSuperior + (self.via.width / 4) - (self.width / 2):
+            if self.posicion[1] > limiteSuperior + (self.via.width / 4) - (self.width / 2):
                 y = self.posicion[1] - 3
                 if self.sentido == 1:
                     self.angle = 130
@@ -102,7 +106,7 @@ class Vehiculo:
                 self.angle = 0
                 y = self.posicion[1]
         else:  # Esta en el superior hay que cambiar
-            if self.posicion[1] < self.via.divisionCarriles + (self.via.width / 4) - (self.width / 2):
+            if self.posicion[1] < divisionCarriles + (self.via.width / 4) - (self.width / 2):
                 y = self.posicion[1] + 3
                 if self.sentido == 1:
                     self.angle = 230
@@ -114,9 +118,9 @@ class Vehiculo:
                 y = self.posicion[1]
         self.posicion = np.array([self.posicion[0], y])
 
-    def cambiarCarrilNorteSur(self):
+    def cambiarCarrilNorteSur(self, limiteSuperior, divisionCarriles):
         if self.carril == 2:  # Esta en el inferior hay que cambiar
-            if self.posicion[0] > self.via.limiteSuperior + (self.via.width / 4) - (self.width / 2) - (self.height / 2):
+            if self.posicion[0] > limiteSuperior + (self.via.width / 4) - (self.width / 2):
                 x = self.posicion[0] - 3
                 if self.sentido == 1:
                     self.angle = 130
@@ -127,7 +131,7 @@ class Vehiculo:
                 self.angle = 90
                 x = self.posicion[0]
         else:  # Esta en el superior hay que cambiarCarril
-            if self.posicion[0] < self.via.divisionCarriles + (self.via.width / 4) - (self.width / 2) - (self.height / 2):
+            if self.posicion[0] < divisionCarriles + (self.via.width / 4) - (self.width / 2) - (self.height / 2):
                 x = self.posicion[0] + 3
                 if self.sentido == 1:
                     self.angle = 230
