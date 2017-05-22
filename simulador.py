@@ -52,6 +52,17 @@ class Simulador:
         while True:
             for x in xrange(0, len(self.vehiculos)):
                 self.vehiculos[x].mover()
+                if self.vehiculos[x].verificiarContencion() is False:
+                    if self.vehiculos[x].sentido == 1:
+                        if self.ventana.reaccionarSemaforo(self.vehiculos[x].via.fin, self.vehiculos[x].via) is True:
+                            self.vehiculos[x].frenar(np.array([0, 0]))
+                        else:
+                            self.vehiculos[x].setVelocidad()
+                    else:
+                        if self.ventana.reaccionarSemaforo(self.vehiculos[x].via.inicio, self.vehiculos[x].via) is True:
+                            self.vehiculos[x].frenar(np.array([0, 0]))
+                        else:
+                            self.vehiculos[x].setVelocidad()
                 pass
             self.ventana.dibujarOvalos(self.vehiculos)
             time.sleep(0.01)

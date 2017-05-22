@@ -19,6 +19,13 @@ class Vehiculo:
         self.vehiculos = vehiculos
         self.setSentido()
         self.setPosicion()
+        self.setVelocidad()
+        # depende de la velocidad
+        self.distanciaPrudente = 10
+        self.color = ("#%03x" % random.randint(0, 0xFFF))  # Aleatorio Hexadecimal
+        # print self.coordenadas
+
+    def setVelocidad(self):
         if self.via.posicion == 1:
             self.angle = 0
             self.velocidad = np.array([random.randrange(1, 4), 0])  # Velocidad en Y = 0
@@ -26,10 +33,6 @@ class Vehiculo:
             self.angle = 90
             self.velocidad = np.array([0, random.randrange(1, 4)])  # Velocidad en X = 0
         self.velocidadOriginal = self.velocidad
-        # depende de la velocidad
-        self.distanciaPrudente = 10
-        self.color = ("#%03x" % random.randint(0, 0xFFF))  # Aleatorio Hexadecimal
-        # print self.coordenadas
 
     def setSentido(self):
         if self.carril == 1:
@@ -44,18 +47,18 @@ class Vehiculo:
             else:
                 coord = self.via.divisionInicio['y'] + (self.via.width / 4) - (self.width / 2)
             if self.sentido == 1:
-                self.posicion = np.array([-self.height, coord])
+                self.posicion = np.array([self.via.inicio.position['x'], coord])
             else:
-                self.posicion = np.array([self.anchoVentana + self.height, coord])
+                self.posicion = np.array([self.via.fin.position['x'], coord])
         else:
             if self.carril == 1:  # Carril superior
                 coord = self.via.limiteSuperior['x1'] + (self.via.width / 4)
             else:
                 coord = self.via.divisionInicio['x'] + (self.via.width / 4)
             if self.sentido == 1:
-                self.posicion = np.array([coord - (self.height / 2), -self.height])
+                self.posicion = np.array([coord - (self.height / 2), self.via.inicio.position['y']])
             else:
-                self.posicion = np.array([coord - (self.height / 2), self.altoVentana + self.height])
+                self.posicion = np.array([coord - (self.height / 2), self.via.fin.position['y']])
 
     def mover(self):
         adelante, velocidad = self.verificarAdelante()
@@ -86,6 +89,23 @@ class Vehiculo:
             self.velocidad[0] = self.velocidad[0] + random.randrange(0, 1)
         else:
             self.velocidad[1] = self.velocidad[1] + random.randrange(0, 1)
+
+    def verificiarContencion(self):
+        if self.via.posicion == 1:
+            if self.sentido == 1:
+                if self.posicion[0] > self.via.fin.position['x']:
+                    return False
+            else:
+                if self.posicion[0] < self.via.inicio.position['x']:
+                    return False
+        elif self.via.posicion == 2:
+            if self.sentido == 1:
+                if self.posicion[1] > self.via.fin.position['y']:
+                    return False
+            else:
+                if self.posicion[1] < self.via.inicio.position['y']:
+                    return False
+        return True
 
     def cambiarCarril(self):
         if self.via.posicion == 1:

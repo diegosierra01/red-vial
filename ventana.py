@@ -121,6 +121,15 @@ class Ventana:
                     semaforo.asignarColor()
                     self.canvasPrincipal.itemconfig(semaforo.dibujo, fill=semaforo.color)
 
+    def reaccionarSemaforo(self, vertice, via):
+        for interseccion in self.intersecciones:
+            if interseccion.vertice == vertice:
+                for semaforo in interseccion.semaforos:
+                    if via == semaforo.via:
+                        if semaforo.estado is False:
+                            return True
+        return False
+
 
 class Via:
 
@@ -169,6 +178,12 @@ class Via:
             self.limiteInferior['y2'] = self.divisionInicio['y'] + (self.width / 2)
             self.limiteInferior['x1'] = self.divisionInicio['x']
             self.limiteInferior['x2'] = self.divisionFin['x']
+            if self.divisionFin['x'] > self.divisionInicio['x']:
+                self.inicio = lineaDivision.vertice1
+                self.fin = lineaDivision.vertice2
+            elif self.divisionFin['x'] < self.divisionInicio['x']:
+                self.inicio = lineaDivision.vertice2
+                self.fin = lineaDivision.vertice1
         elif self.divisionInicio['x'] == self.divisionFin['x']:
             # Der a izq
             self.posicion = 2
@@ -180,6 +195,12 @@ class Via:
             self.limiteInferior['x2'] = self.divisionInicio['x'] + (self.width / 2)
             self.limiteInferior['y1'] = self.divisionInicio['y']
             self.limiteInferior['y2'] = self.divisionFin['y']
+            if self.divisionFin['y'] > self.divisionInicio['y']:
+                self.inicio = lineaDivision.vertice1
+                self.fin = lineaDivision.vertice2
+            elif self.divisionFin['y'] < self.divisionInicio['y']:
+                self.inicio = lineaDivision.vertice2
+                self.fin = lineaDivision.vertice1
         else:
             # diagonal
             self.posicion = 3
@@ -206,7 +227,7 @@ class Interseccion:
 
     def crearSemaforos(self):
         viascubiertas = []
-        estado = True
+        estado = False
         while len(viascubiertas) < (len(self.vias) - 1):
             numerorandom = random.randrange(0, len(self.vias) - 1)
             valido = True
