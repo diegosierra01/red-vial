@@ -9,21 +9,26 @@ class Vehiculo:
 
     dibujo = None  # Es la referencia del dibujo que pertenece a esta particula en el canvas
 
-    def __init__(self, via, vehiculos, anchoVentana, altoVentana):
+    def __init__(self, origen, destino, vehiculos, anchoVentana, altoVentana):
         self.height = random.randrange(30, 80)
         self.width = 20
+        # provisional para dar una ruta al vehiculo
+        self.recorrido = 1
+        self.origen = origen
+        self.actual = origen
+        self.destino = destino
         self.anchoVentana = anchoVentana
         self.altoVentana = altoVentana
         self.carril = random.randrange(1, 3)  # La vía tiene dos carriles
-        self.via = via
         self.vehiculos = vehiculos
+        self.color = ("#%03x" % random.randint(0, 0xFFF))  # Aleatorio Hexadecimal
+        # print self.coordenadas if actual es igual al inicio de la via o al fin de la via par adarle sentido
+
+    def setVia(self, via):
+        self.via = via
         self.setSentido()
         self.setPosicion()
         self.setVelocidad()
-        # depende de la velocidad
-        self.distanciaPrudente = 10
-        self.color = ("#%03x" % random.randint(0, 0xFFF))  # Aleatorio Hexadecimal
-        # print self.coordenadas
 
     def setVelocidad(self):
         if self.via.posicion == 1:
@@ -33,6 +38,11 @@ class Vehiculo:
             self.angle = 90
             self.velocidad = np.array([0, random.randrange(1, 4)])  # Velocidad en X = 0
         self.velocidadOriginal = self.velocidad
+        if self.via.posicion == 1:
+            # depende de la velocidad - distancia de frenado
+            self.distanciaPrudente = self.velocidad[0] * 5
+        elif self.via.posicion == 2:
+            self.distanciaPrudente = self.velocidad[1] * 5
 
     def setSentido(self):
         if self.carril == 1:
@@ -93,17 +103,17 @@ class Vehiculo:
     def verificiarContencion(self):
         if self.via.posicion == 1:
             if self.sentido == 1:
-                if self.posicion[0] > self.via.fin.position['x']:
+                if self.posicion[0] + self.distanciaPrudente > self.via.fin.position['x'] - self.via.width:
                     return False
             else:
-                if self.posicion[0] < self.via.inicio.position['x']:
+                if self.posicion[0] - self.distanciaPrudente < self.via.inicio.position['x'] + self.via.width:
                     return False
         elif self.via.posicion == 2:
             if self.sentido == 1:
-                if self.posicion[1] > self.via.fin.position['y']:
+                if self.posicion[1] + self.distanciaPrudente > self.via.fin.position['y'] - self.via.width:
                     return False
             else:
-                if self.posicion[1] < self.via.inicio.position['y']:
+                if self.posicion[1] - self.distanciaPrudente < self.via.inicio.position['y'] + self.via.width:
                     return False
         return True
 

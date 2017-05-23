@@ -28,11 +28,11 @@ class Ventana:
         self.vias = []
         self.intersecciones = []
         self.tamano = tamano
-        gui = Gui(self.tamano)
-        gui.dibujarNodos()
-        gui.mostrar()
-        self.crearVias(gui.aristas.aristas)
-        self.crearIntersecciones(gui.vertices.vertices)
+        self.gui = Gui(self.tamano)
+        self.gui.dibujarNodos()
+        self.gui.mostrar()
+        self.crearVias(self.gui.aristas.aristas)
+        self.crearIntersecciones(self.gui.vertices.vertices)
 
     def inicializar(self):
         self.ventanaPrincipal = Tk()
@@ -130,6 +130,17 @@ class Ventana:
                             return True
         return False
 
+    def buscarVia(self, vertice1, vertice2):
+        resultado = None
+        for via in self.vias:
+            if (via.inicio == vertice1 and via.fin == vertice2) or (via.inicio == vertice2 and via.fin == vertice1):
+                print "encontrada"
+                resultado = via
+        if resultado is None:
+            self.canvasPrincipal.create_oval(vertice1.position['x'], vertice1.position['y'], vertice1.position['x'] + 10, vertice1.position['y'] + 10)
+            self.canvasPrincipal.create_oval(vertice2.position['x'], vertice2.position['y'], vertice2.position['x'] + 10, vertice2.position['y'] + 10)
+        return resultado
+
 
 class Via:
 
@@ -157,6 +168,7 @@ class Via:
         # self.sentido2 = random.randrange(1, 3)
         self.sentido1 = 1
         self.sentido2 = 2
+        # problema 
         self.arista = lineaDivision
         self.divisionInicio = lineaDivision.vertice1.position
         self.divisionFin = lineaDivision.vertice2.position
