@@ -19,14 +19,19 @@ class Vehiculo:
         self.destino = destino
         self.anchoVentana = anchoVentana
         self.altoVentana = altoVentana
-        self.carril = random.randrange(1, 3)  # La vía tiene dos carriles
         self.vehiculos = vehiculos
         self.color = ("#%03x" % random.randint(0, 0xFFF))  # Aleatorio Hexadecimal
         # print self.coordenadas if actual es igual al inicio de la via o al fin de la via par adarle sentido
 
     def setVia(self, via):
         self.via = via
-        self.setSentido()
+        # self.setSentido()
+        if self.actual == self.via.inicio:
+            self.sentido = 1
+            self.carril = 1  # La vía tiene dos carriles
+        elif self.actual == self.via.fin:
+            self.sentido = 2
+            self.carril = 2  # La vía tiene dos carriles
         self.setPosicion()
         self.setVelocidad()
 
