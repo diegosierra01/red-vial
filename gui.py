@@ -48,6 +48,7 @@ class Gui:
             print 'arista:' + str(arista.vertice1.nombre) + ' - ' + str(arista.vertice2.nombre) + ' - distancia: ' + str(arista.distancia)
 
         self.generarMatriz()
+        self.ventana.destroy()
 
     def generarMatriz(self):
         self.matriz = np.zeros((len(self.vertices.vertices), len(self.vertices.vertices)))  # +1 de los nombres
@@ -100,7 +101,8 @@ class Gui:
             ultimoVertice = self.vertices.ultimoAgregado
             # arista = Arista(vertice,ultimoVertice)
             arista = Arista(ultimoVertice, vertice)
-            if not self.aristas.existeArista(arista) and ultimoVertice.position != vertice.position:
+            #print arista.angulo* (180.0 / math.pi)
+            if not self.aristas.existeArista(arista) and ultimoVertice.position != vertice.position and self.validarAngulo(arista.angulo):
                 self.aristas.agregar(arista)
                 print arista.distancia
                 self.canvas.create_line(arista.vertice1.position['x'], arista.vertice1.position['y'], arista.vertice2.position['x'], arista.vertice2.position['y'], fill="black", width=2)
@@ -111,6 +113,14 @@ class Gui:
                 return False
         else:
             return True
+
+    def validarAngulo(self, angulo):
+        angulosPermitidos = [0, 180, 90, -90]
+
+        for anguloPermitido in angulosPermitidos:
+            if (anguloPermitido) == (angulo * (180.0 / math.pi)):
+                return True
+        return False
 
     def dibujarNodos(self):
         cantidadDivisiones = 8

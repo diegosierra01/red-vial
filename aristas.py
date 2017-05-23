@@ -37,9 +37,19 @@ class Arista:
         self.vertice1 = vertice1
         self.vertice2 = vertice2
         self.calcularDistancia()
+        self.calcularAngulo()
 
     def calcularDistancia(self):
         self.distancia = math.sqrt(pow((self.vertice2.position['x'] - self.vertice1.position['x']), 2) + pow((self.vertice2.position['y'] - self.vertice1.position['y']), 2))
 
-    def calcularAngulo(self):  # Angulo con respecto a x
-        pass
+    def calcularAngulo(self): # Angulo con respecto a x
+        x1 = self.vertice1.position['x']
+        y1 = self.vertice1.position['y']
+
+        x2 = self.vertice2.position['x']
+        y2 = self.vertice2.position['y']
+        
+        self.angulo = math.atan2( (y2 - y1), (x2-x1) )
+
+        #print self.angulo * (180.0 / math.pi)
+

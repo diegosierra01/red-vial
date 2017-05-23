@@ -12,7 +12,7 @@ from ventana import Via
 class Simulador:
 
     anchoVentana = 1000
-    alturaVentana = 700
+    alturaVentana = 600
 
     def __init__(self):
         # self.generarVias()

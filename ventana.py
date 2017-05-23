@@ -179,6 +179,8 @@ class Via:
             self.width = {1: 48, 2: 50, 3: 52, 4: 54, 5: 56}[self.ancho]
         except KeyError:
             self.width = 100
+
+
         if self.divisionInicio['y'] == self.divisionFin['y']:
             # Arr a aba
             self.posicion = 1
@@ -186,16 +188,22 @@ class Via:
             self.limiteSuperior['y2'] = self.divisionInicio['y'] - (self.width / 2)
             self.limiteSuperior['x1'] = self.divisionInicio['x']
             self.limiteSuperior['x2'] = self.divisionFin['x']
+
+
             self.limiteInferior['y1'] = self.divisionInicio['y'] + (self.width / 2)
             self.limiteInferior['y2'] = self.divisionInicio['y'] + (self.width / 2)
             self.limiteInferior['x1'] = self.divisionInicio['x']
             self.limiteInferior['x2'] = self.divisionFin['x']
+
+
             if self.divisionFin['x'] > self.divisionInicio['x']:
                 self.inicio = lineaDivision.vertice1
                 self.fin = lineaDivision.vertice2
             elif self.divisionFin['x'] < self.divisionInicio['x']:
                 self.inicio = lineaDivision.vertice2
                 self.fin = lineaDivision.vertice1
+
+                
         elif self.divisionInicio['x'] == self.divisionFin['x']:
             # Der a izq
             self.posicion = 2
