@@ -1,2 +1,9 @@
+<<<<<<< HEAD
 vehiculo.pyc
 ventana.pyc
+=======
+*.pyc
+vehiculo.pyc
+ventana.pyc
+
+>>>>>>> 5ebec420b75a40412c65f4434790c557100fb915
