@@ -17,6 +17,7 @@ class Gui:
     vertices = Vertices()
     aristas = Aristas()
     matriz = np.zeros((0, 0))
+    via = []
 
     def __init__(self, tamano):
         self.tamano = tamano
@@ -61,6 +62,7 @@ class Gui:
 
     def detectarClick(self, evento):
         # diametro = 20
+        
         x = evento.x
         y = evento.y
         for dibujo in self.dibujos:
@@ -88,12 +90,16 @@ class Gui:
         vertice = Vertice((len(self.vertices)), position)
 
         if self.vertices.existeVertice(vertice.position):  # Es un vetice ya agregado, se obtiene para no enviar uno nuevo con nombre diferente
-            print "existe"
             vertice = self.vertices.obtenerConPosicion(vertice.position)
 
-        aristaAgregada = self.agregarArista(vertice)
-        if aristaAgregada:
+        if (len(self.via) == 1):          
+            aristaAgregada = self.agregarArista(vertice)
+            if aristaAgregada:
+                self.vertices.agregar(vertice)
+            self.via = []
+        else:
             self.vertices.agregar(vertice)
+            self.via.append(vertice)
 
     def agregarArista(self, vertice):
         if(len(self.vertices) > 0):
