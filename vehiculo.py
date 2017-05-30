@@ -3,16 +3,19 @@
 
 import random
 import numpy as np
+import time
 
 
 class Vehiculo:
 
     dibujo = None  # Es la referencia del dibujo que pertenece a esta particula en el canvas
 
-    def __init__(self, origen, destino, vehiculos, anchoVentana, altoVentana):
+    def __init__(self, origen, destino, vehiculos, anchoVentana, altoVentana, vertices, ventana):
         self.height = random.randrange(30, 80)
         self.width = 20
+        self.ventana = ventana
         # provisional para dar una ruta al vehiculo
+        self.vertices = vertices
         self.recorrido = 1
         self.origen = origen
         self.actual = origen
@@ -22,6 +25,31 @@ class Vehiculo:
         self.vehiculos = vehiculos
         self.color = ("#%03x" % random.randint(0, 0xFFF))  # Aleatorio Hexadecimal
         # print self.coordenadas if actual es igual al inicio de la via o al fin de la via par adarle sentido
+
+    def reaccionar(self):
+        while(True):
+            self.mover()
+            if self.verificiarContencion() is False:
+                if self.recorrido < len(self.ventana.gui.vertices.vertices):
+                    if self.sentido == 1:
+                        if self.ventana.reaccionarSemaforo(self.via.fin, self.via) is True:
+                            self.frenar(np.array([0, 0]))
+                            # aqui se agrega el algoritmo de busqueda por peso, congestio, etc...
+                        else:
+                            self.actual = self.via.fin
+                            self.setVia(self.ventana.buscarVia(self.actual, self.vertices[self.recorrido]))
+                            self.recorrido = self.recorrido + 1
+                    else:
+                        if self.ventana.reaccionarSemaforo(self.via.inicio, self.via) is True:
+                            self.frenar(np.array([0, 0]))
+                        else:
+                            self.actual = self.via.inicio
+                            self.setVia(self.ventana.buscarVia(self.actual, self.vertices[self.recorrido]))
+                            self.recorrido = self.recorrido + 1
+                else:
+                    self.setVelocidad()
+                    self.mover()
+            time.sleep(0.001)
 
     def setVia(self, via):
         self.via = via

@@ -43,10 +43,13 @@ class Simulador:
         for i in xrange(0, cantidadParticulas):
             origen = self.ventana.gui.vertices.vertices[0]
             destino = self.ventana.gui.vertices.vertices[len(self.ventana.gui.vertices.vertices) - 1]
-            vehiculo = Vehiculo(origen, destino, self.vehiculos, self.anchoVentana, self.alturaVentana)
+            vehiculo = Vehiculo(origen, destino, self.vehiculos, self.anchoVentana, self.alturaVentana, self.ventana.gui.vertices.vertices, self.ventana)
             # self.ventana.vias[random.randrange(0, len(self.ventana.vias))]
             vehiculo.setVia(self.ventana.buscarVia(vehiculo.actual, self.ventana.gui.vertices.vertices[vehiculo.recorrido]))
             vehiculo.recorrido = vehiculo.recorrido + 1
+            hiloVerificador = threading.Thread(target=vehiculo.reaccionar)
+            hiloVerificador.daemon = True
+            hiloVerificador.start()
             self.vehiculos.append(vehiculo)
             espera = np.random.uniform(0.1, 5)
             time.sleep(espera)
@@ -55,28 +58,6 @@ class Simulador:
     # ....Hilo.....
     def moverParticulas(self):
         while True:
-            for x in xrange(0, len(self.vehiculos)):
-                self.vehiculos[x].mover()
-                if self.vehiculos[x].verificiarContencion() is False:
-                    if self.vehiculos[x].recorrido < len(self.ventana.gui.vertices.vertices):
-                        if self.vehiculos[x].sentido == 1:
-                            if self.ventana.reaccionarSemaforo(self.vehiculos[x].via.fin, self.vehiculos[x].via) is True:
-                                self.vehiculos[x].frenar(np.array([0, 0]))
-                                # aqui se agrega el algoritmo de busqueda por peso, congestio, etc...
-                            else:
-                                self.vehiculos[x].actual = self.vehiculos[x].via.fin
-                                self.vehiculos[x].setVia(self.ventana.buscarVia(self.vehiculos[x].actual, self.ventana.gui.vertices.vertices[self.vehiculos[x].recorrido]))
-                                self.vehiculos[x].recorrido = self.vehiculos[x].recorrido + 1
-                        else:
-                            if self.ventana.reaccionarSemaforo(self.vehiculos[x].via.inicio, self.vehiculos[x].via) is True:
-                                self.vehiculos[x].frenar(np.array([0, 0]))
-                            else:
-                                self.vehiculos[x].actual = self.vehiculos[x].via.inicio
-                                self.vehiculos[x].setVia(self.ventana.buscarVia(self.vehiculos[x].actual, self.ventana.gui.vertices.vertices[self.vehiculos[x].recorrido]))
-                                self.vehiculos[x].recorrido = self.vehiculos[x].recorrido + 1
-                    else:
-                        self.vehiculos[x].mover()
-                pass
             self.ventana.dibujarOvalos(self.vehiculos)
             time.sleep(0.01)
 
