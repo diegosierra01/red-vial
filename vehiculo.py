@@ -28,7 +28,6 @@ class Vehiculo:
 
     def reaccionar(self):
         while(True):
-            self.mover()
             if self.verificiarContencion() is False:
                 if self.recorrido < len(self.ventana.gui.vertices.vertices):
                     if self.sentido == 1:
@@ -39,6 +38,7 @@ class Vehiculo:
                             self.actual = self.via.fin
                             self.setVia(self.ventana.buscarVia(self.actual, self.vertices[self.recorrido]))
                             self.recorrido = self.recorrido + 1
+                            self.mover()
                     else:
                         if self.ventana.reaccionarSemaforo(self.via.inicio, self.via) is True:
                             self.frenar(np.array([0, 0]))
@@ -46,10 +46,13 @@ class Vehiculo:
                             self.actual = self.via.inicio
                             self.setVia(self.ventana.buscarVia(self.actual, self.vertices[self.recorrido]))
                             self.recorrido = self.recorrido + 1
+                            self.mover()
                 else:
                     self.setVelocidad()
                     self.mover()
-            time.sleep(0.001)
+            else:
+                self.mover()
+            time.sleep(0.01)
 
     def setVia(self, via):
         self.via = via
@@ -111,7 +114,10 @@ class Vehiculo:
             else:
                 self.cambiarCarril()
         else:
-            self.acelerar()
+            # self.acelerar()
+            if (self.via.posicion == 1 and self.velocidad[0] == 0) or (self.via.posicion == 2 and self.velocidad[1] == 0):
+                print str(self.velocidad[0]) + " _ " + str(self.velocidad[1])
+                self.setVelocidad()
         if self.sentido == 1:
             self.posicion = self.posicion + self.velocidad
         else:
@@ -129,9 +135,9 @@ class Vehiculo:
 
     def acelerar(self):
         if self.via.posicion == 1:
-            self.velocidad[0] = self.velocidad[0] + random.randrange(0, 1)
+            self.velocidad[0] = self.velocidad[0] + random.randrange(0, 2)
         else:
-            self.velocidad[1] = self.velocidad[1] + random.randrange(0, 1)
+            self.velocidad[1] = self.velocidad[1] + random.randrange(0, 2)
 
     def verificiarContencion(self):
         if self.via.posicion == 1:
