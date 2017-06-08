@@ -23,36 +23,40 @@ class Vehiculo:
         self.anchoVentana = anchoVentana
         self.altoVentana = altoVentana
         self.vehiculos = vehiculos
+        self.llegada = False
+        self.tiempo = 0
         self.color = ("#%03x" % random.randint(0, 0xFFF))  # Aleatorio Hexadecimal
         # print self.coordenadas if actual es igual al inicio de la via o al fin de la via par adarle sentido
 
     def reaccionar(self):
         while(True):
             if self.verificiarContencion() is False:
-                if self.recorrido < len(self.ventana.gui.vertices.vertices):
-                    if self.sentido == 1:
-                        if self.ventana.reaccionarSemaforo(self.via.fin, self.via) is True:
-                            self.frenar(np.array([0, 0]))
-                            # aqui se agrega el algoritmo de busqueda por peso, congestio, etc...
-                        else:
-                            self.actual = self.via.fin
-                            self.setVia(self.ventana.buscarVia(self.actual, self.vertices[self.recorrido]))
-                            self.recorrido = self.recorrido + 1
-                            self.mover()
-                    else:
-                        if self.ventana.reaccionarSemaforo(self.via.inicio, self.via) is True:
-                            self.frenar(np.array([0, 0]))
-                        else:
-                            self.actual = self.via.inicio
-                            self.setVia(self.ventana.buscarVia(self.actual, self.vertices[self.recorrido]))
-                            self.recorrido = self.recorrido + 1
-                            self.mover()
+                self.tiempo = self.tiempo + 1
+                if self.ventana.reaccionarSemaforo(self.via.fin, self.via) is True:
+                    self.frenar(np.array([0, 0]))
+                    # aqui se agrega el algoritmo de busqueda por peso, congestio, etc...
                 else:
-                    self.setVelocidad()
-                    self.mover()
+                    if self.sentido == 1:
+                        self.actual = self.via.fin
+                    else:
+                        self.actual = self.via.inicio
+                    self.verficarLlegada()
             else:
                 self.mover()
+                self.tiempo = self.tiempo + 1
             time.sleep(0.01)
+
+    def verficarLlegada(self):
+        if self.actual != self.destino:
+            self.setVia(self.ventana.buscarVia(self.actual, self.vertices[self.recorrido]))
+            self.recorrido = self.recorrido + 1
+            self.mover()
+        else:
+            self.setVelocidad()
+            self.mover()
+            if self.llegada is False:
+                print self.tiempo
+                self.llegada = True
 
     def setVia(self, via):
         self.via = via
@@ -116,7 +120,6 @@ class Vehiculo:
         else:
             # self.acelerar()
             if (self.via.posicion == 1 and self.velocidad[0] == 0) or (self.via.posicion == 2 and self.velocidad[1] == 0):
-                print str(self.velocidad[0]) + " _ " + str(self.velocidad[1])
                 self.setVelocidad()
         if self.sentido == 1:
             self.posicion = self.posicion + self.velocidad
