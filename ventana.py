@@ -141,6 +141,12 @@ class Ventana:
             self.canvasPrincipal.create_oval(vertice2.position['x'], vertice2.position['y'], vertice2.position['x'] + 10, vertice2.position['y'] + 10)
         return resultado
 
+    def buscarInterseccion(self, vertice):
+        for interseccion in self.intersecciones:
+            if interseccion.vertice == vertice:
+                return interseccion
+        return None
+
 
 class Via:
 
@@ -149,6 +155,7 @@ class Via:
         # self.sentido2 = random.randrange(1, 3)
         self.sentido1 = 1
         self.sentido2 = 2
+        self.pendiente = 1
         # problema
         self.arista = lineaDivision
         self.divisionInicio = lineaDivision.vertice1.position
