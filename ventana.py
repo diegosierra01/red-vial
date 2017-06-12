@@ -224,7 +224,7 @@ class Interseccion:
 
     def crearSemaforos(self):
         viascubiertas = []
-        estado = False
+        estado = True
         while len(viascubiertas) < (len(self.vias) - 1):
             numerorandom = random.randrange(0, len(self.vias) - 1)
             valido = True

@@ -3,16 +3,19 @@
 
 import random
 import numpy as np
+import time
 
 
 class Vehiculo:
 
     dibujo = None  # Es la referencia del dibujo que pertenece a esta particula en el canvas
 
-    def __init__(self, origen, destino, vehiculos, anchoVentana, altoVentana):
+    def __init__(self, origen, destino, vehiculos, anchoVentana, altoVentana, vertices, ventana):
         self.height = random.randrange(30, 80)
         self.width = 20
+        self.ventana = ventana
         # provisional para dar una ruta al vehiculo
+        self.vertices = vertices
         self.recorrido = 1
         self.origen = origen
         self.actual = origen
@@ -20,8 +23,40 @@ class Vehiculo:
         self.anchoVentana = anchoVentana
         self.altoVentana = altoVentana
         self.vehiculos = vehiculos
+        self.llegada = False
+        self.tiempo = 0
         self.color = ("#%03x" % random.randint(0, 0xFFF))  # Aleatorio Hexadecimal
         # print self.coordenadas if actual es igual al inicio de la via o al fin de la via par adarle sentido
+
+    def reaccionar(self):
+        while(True):
+            if self.verificiarContencion() is False:
+                self.tiempo = self.tiempo + 1
+                if self.ventana.reaccionarSemaforo(self.via.fin, self.via) is True:
+                    self.frenar(np.array([0, 0]))
+                    # aqui se agrega el algoritmo de busqueda por peso, congestio, etc...
+                else:
+                    if self.sentido == 1:
+                        self.actual = self.via.fin
+                    else:
+                        self.actual = self.via.inicio
+                    self.verficarLlegada()
+            else:
+                self.mover()
+                self.tiempo = self.tiempo + 1
+            time.sleep(0.01)
+
+    def verficarLlegada(self):
+        if self.actual != self.destino:
+            self.setVia(self.ventana.buscarVia(self.actual, self.vertices[self.recorrido]))
+            self.recorrido = self.recorrido + 1
+            self.mover()
+        else:
+            self.setVelocidad()
+            self.mover()
+            if self.llegada is False:
+                print self.tiempo
+                self.llegada = True
 
     def setVia(self, via):
         self.via = via
@@ -83,7 +118,9 @@ class Vehiculo:
             else:
                 self.cambiarCarril()
         else:
-            self.acelerar()
+            # self.acelerar()
+            if (self.via.posicion == 1 and self.velocidad[0] == 0) or (self.via.posicion == 2 and self.velocidad[1] == 0):
+                self.setVelocidad()
         if self.sentido == 1:
             self.posicion = self.posicion + self.velocidad
         else:
@@ -101,9 +138,9 @@ class Vehiculo:
 
     def acelerar(self):
         if self.via.posicion == 1:
-            self.velocidad[0] = self.velocidad[0] + random.randrange(0, 1)
+            self.velocidad[0] = self.velocidad[0] + random.randrange(0, 2)
         else:
-            self.velocidad[1] = self.velocidad[1] + random.randrange(0, 1)
+            self.velocidad[1] = self.velocidad[1] + random.randrange(0, 2)
 
     def verificiarContencion(self):
         if self.via.posicion == 1:
