@@ -59,7 +59,6 @@ class Gui:
                 #position = {'x': x, 'y':y}
                 #vertice = Vertice((len(self.vertices)), position)
 
-
                 for vertice in self.vertices:
                     
                     if vertice.position['x']-10 == dibujo['x'] and vertice.position['y']-10 == dibujo['y']:

@@ -48,7 +48,7 @@ class Simulador:
             destino = self.ventana.gui.vertices.vertices[len(self.ventana.gui.vertices.vertices) - 1]
             vehiculo = Vehiculo(origen, destino, self.vehiculos, self.anchoVentana, self.alturaVentana, self.ventana.gui.vertices.vertices, self.ventana)
             # self.ventana.vias[random.randrange(0, len(self.ventana.vias))]
-            vehiculo.setVia(self.seleccionarDestino(origen))
+            vehiculo.setVia(self.ventana.seleccionarDestino(origen))
             vehiculo.recorrido = vehiculo.recorrido + 1
             hiloVerificador = threading.Thread(target=vehiculo.reaccionar)
             hiloVerificador.daemon = True
@@ -58,13 +58,7 @@ class Simulador:
             time.sleep(espera)
             pass
 
-    def seleccionarDestino(self, origen):
-        vias = self.ventana.buscarVias(origen)
-        print len(vias)        
-        index = random.randrange(0, len(vias))
-
-        via = vias[index]
-        return via
+    
        # if origen == via.inicio:
        #     return via.fin
        # else:
