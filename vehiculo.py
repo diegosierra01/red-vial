@@ -8,6 +8,8 @@ import time
 
 class Vehiculo:
 
+    # vertices con entrada y salida
+    # toma de desiciones
     dibujo = None  # Es la referencia del dibujo que pertenece a esta particula en el canvas
 
     def __init__(self, origen, destino, vehiculos, anchoVentana, altoVentana, vertices, ventana):
