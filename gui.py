@@ -58,14 +58,21 @@ class Gui:
 
                 #position = {'x': x, 'y':y}
                 #vertice = Vertice((len(self.vertices)), position)
-                print i
-                vertice = self.vertices.vertices[i]
-                self.origenes.append(vertice)
+
+
+                for vertice in self.vertices:
+                    
+                    if vertice.position['x']-10 == dibujo['x'] and vertice.position['y']-10 == dibujo['y']:
+                        print "econtrado"
+                        self.origenes.append(vertice)
+                        break
+                    pass
+                
 
                 self.dibujarCuadrado(dibujo)
                 # self.agregarVertice({'x':evento.x, 'y':evento.y})
-                i = i +1
                 break  # Para que ya no revise mas
+            i = i +1
 
     def dibujarCuadrado(self, dibujo):
         x = dibujo['x']
