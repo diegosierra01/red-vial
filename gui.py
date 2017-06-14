@@ -19,6 +19,10 @@ class Gui:
     matriz = np.zeros((0, 0))
     via = []
 
+    origenes = []
+
+    seleccionandoOrigenes = False
+
     def __init__(self, tamano):
         self.tamano = tamano
         self.ventana = Tk()
@@ -32,7 +36,36 @@ class Gui:
         # self.boton = Button(self.ventana, text="GUARDAR RED VIAL", width=tamano['ancho'], command=self.guardarRedVial, bg='green')
         self.boton = Button(self.ventana, text="GUARDAR RED VIAL", command=self.guardarRedVial, bg='green')
         self.boton.pack()
+
+        self.botonOrigenes = Button(self.ventana, text="Seleccionar origenes", command=self.seleccionarOrigenes, bg='green')
+        self.botonOrigenes.pack()
+
         self.dibujos = []
+
+    def seleccionarOrigenes(self):
+        if self.seleccionandoOrigenes == False:
+            self.seleccionandoOrigenes = True
+            return
+        if self.seleccionandoOrigenes == True:
+            self.seleccionandoOrigenes = False
+            return
+
+
+    def seleccionarOrigen(self, x, y):
+        for dibujo in self.dibujos:
+            if (self.estaRangoCirculo(x, y, dibujo)):
+                origenes.append({'x': x, 'y':y})
+                self.dibujarCuadrado(dibujo)
+                # self.agregarVertice({'x':evento.x, 'y':evento.y})
+                break  # Para que ya no revise mas
+
+    def dibujarCuadrado(self, dibujo):
+        x = dibujo['x']
+        y = dibujo['y']
+        dibujo = self.canvas.create_rectangle(x, y, x + self.diametro, y + self.diametro)
+        
+
+
 
     def guardarRedVial(self):
 
@@ -65,11 +98,15 @@ class Gui:
         
         x = evento.x
         y = evento.y
-        for dibujo in self.dibujos:
-            if (self.estaRangoCirculo(x, y, dibujo)):
-                self.agregarVertice({'x': dibujo['x'], 'y': dibujo['y']})
-                # self.agregarVertice({'x':evento.x, 'y':evento.y})
-                break  # Para que ya no revise mas
+
+        if self.seleccionandoOrigenes == True:
+            self.seleccionarOrigen(x, y)
+        else: # Seleccionando vertices
+            for dibujo in self.dibujos:
+                if (self.estaRangoCirculo(x, y, dibujo)):
+                    self.agregarVertice({'x': dibujo['x'], 'y': dibujo['y']})
+                    # self.agregarVertice({'x':evento.x, 'y':evento.y})
+                    break  # Para que ya no revise mas
 
         # if len(self.via)==2:
         #    self.canvas.create_line(self.via[0]['x']+(self.diametro/2), self.via[0]['y']+(self.diametro/2), self.via[1]['x']+(self.diametro/2), self.via[1]['y']+(self.diametro/2), fill="black", width=2)
