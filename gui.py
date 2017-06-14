@@ -34,6 +34,13 @@ class Gui:
         self.canvas.pack(expand=YES, fill=BOTH)
         self.canvas.bind("<Button-1>", self.detectarClick)
         # self.boton = Button(self.ventana, text="GUARDAR RED VIAL", width=tamano['ancho'], command=self.guardarRedVial, bg='green')
+        w = Label(self.ventana, text="Tiempo de simulación en minutos")
+        w.pack()
+
+        self.numero = IntVar()
+        self.entrada1 = Entry(self.ventana, textvariable=self.numero)
+        self.entrada1.pack()
+
         self.boton = Button(self.ventana, text="GUARDAR RED VIAL", command=self.guardarRedVial, bg='green')
         self.boton.pack()
 
@@ -50,7 +57,6 @@ class Gui:
             self.seleccionandoOrigenes = False
             return
 
-
     def seleccionarOrigen(self, x, y):
         i = 0
         for dibujo in self.dibujos:
@@ -60,28 +66,26 @@ class Gui:
                 #vertice = Vertice((len(self.vertices)), position)
 
                 for vertice in self.vertices:
-                    
-                    if vertice.position['x']-10 == dibujo['x'] and vertice.position['y']-10 == dibujo['y']:
+
+                    if vertice.position['x'] - 10 == dibujo['x'] and vertice.position['y'] - 10 == dibujo['y']:
                         print "econtrado"
                         self.origenes.append(vertice)
                         break
                     pass
-                
 
                 self.dibujarCuadrado(dibujo)
                 # self.agregarVertice({'x':evento.x, 'y':evento.y})
                 break  # Para que ya no revise mas
-            i = i +1
+            i = i + 1
 
     def dibujarCuadrado(self, dibujo):
         x = dibujo['x']
         y = dibujo['y']
         dibujo = self.canvas.create_rectangle(x, y, x + self.diametro, y + self.diametro)
-        
-
-
 
     def guardarRedVial(self):
+
+        self.tiempo = self.entrada1.get()
 
         print '*********** NODOS ***************'
         nombre = 1
@@ -109,13 +113,13 @@ class Gui:
 
     def detectarClick(self, evento):
         # diametro = 20
-        
+
         x = evento.x
         y = evento.y
 
         if self.seleccionandoOrigenes == True:
             self.seleccionarOrigen(x, y)
-        else: # Seleccionando vertices
+        else:  # Seleccionando vertices
             for dibujo in self.dibujos:
                 if (self.estaRangoCirculo(x, y, dibujo)):
                     self.agregarVertice({'x': dibujo['x'], 'y': dibujo['y']})
@@ -143,7 +147,7 @@ class Gui:
         if self.vertices.existeVertice(vertice.position):  # Es un vetice ya agregado, se obtiene para no enviar uno nuevo con nombre diferente
             vertice = self.vertices.obtenerConPosicion(vertice.position)
 
-        if (len(self.via) == 1):          
+        if (len(self.via) == 1):
             aristaAgregada = self.agregarArista(vertice)
             if aristaAgregada:
                 self.vertices.agregar(vertice)
@@ -159,9 +163,9 @@ class Gui:
             # arista = Arista(vertice,ultimoVertice)
             arista = Arista(ultimoVertice, vertice)
             print "angulo"
-            #print arista.angulo* (180.0 / math.pi)
+            # print arista.angulo* (180.0 / math.pi)
             print "orientacion"
-            #print arista.orientacion
+            # print arista.orientacion
             if not self.aristas.existeArista(arista) and ultimoVertice.position != vertice.position and self.validarAngulo(arista.angulo):
                 self.aristas.agregar(arista)
                 print arista.distancia

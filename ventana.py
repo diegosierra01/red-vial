@@ -27,6 +27,7 @@ class Ventana:
     def __init__(self, tamano):
         self.vias = []
         self.intersecciones = []
+        self.peatones = []
         self.tamano = tamano
         self.gui = Gui(self.tamano)
         self.gui.dibujarNodos()
@@ -134,7 +135,7 @@ class Ventana:
         resultado = None
         for via in self.vias:
             if (via.inicio == vertice1 and via.fin == vertice2) or (via.inicio == vertice2 and via.fin == vertice1):
-                print "encontrada"
+                # print "encontrada"
                 resultado = via
         if resultado is None:
             self.canvasPrincipal.create_oval(vertice1.position['x'], vertice1.position['y'], vertice1.position['x'] + 10, vertice1.position['y'] + 10)
@@ -147,25 +148,58 @@ class Ventana:
                 return interseccion
         return None
 
-
-    def buscarVias(self, vertice):
+    def buscarVias(self, vertice, viaactual):
         resultado = []
-        print vertice
-        print ""
+        # print vertice
+        # print ""
         for via in self.vias:
-            if (via.inicio == vertice or via.fin == vertice):
-                print "encontrada"
+            if (via.inicio == vertice or via.fin == vertice) and via != viaactual:
                 resultado.append(via)
-        
+        if len(resultado) < 1:
+            resultado.append(viaactual)
         return resultado
 
-    def seleccionarDestino(self, origen):
-        vias = self.buscarVias(origen)
-        
+    def seleccionarDestino(self, origen, viaactual):
+        vias = self.buscarVias(origen, viaactual)
         index = random.randrange(0, len(vias))
-
         via = vias[index]
         return via
+
+    def crearPeatones(self, xmax, xmin, ymax, ymin):
+        peaton = Peaton(random.randrange(xmin - 50, xmax + 50), random.randrange(ymin - 50, ymax + 50))
+        self.peatones.append(peaton)
+
+    def moverPeatones(self):
+        for peaton in self.peatones:
+            peaton.mover()
+            self.canvasPrincipal.delete(peaton.dibujo)  # Borra el dibujo anterior
+            dibujo = self.canvasPrincipal.create_oval(peaton.x, peaton.y, peaton.x + 5, peaton.y + 5, fill='green')
+            peaton.setDibujo(dibujo)
+
+
+class Peaton:
+
+    dibujo = None
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        self.direccionx = random.randrange(1, 3)
+        self.direcciony = random.randrange(1, 3)
+
+    def mover(self):
+        if self.direccionx == 1:
+            self.x = self.x + random.randrange(0, 3)
+        elif self.direccionx == 2:
+            self.x = self.x - random.randrange(0, 3)
+        if self.direcciony == 1:
+            self.y = self.y + random.randrange(0, 3)
+        elif self.direcciony == 2:
+            self.y = self.y - random.randrange(0, 3)
+
+    # Para referenciar el dibujo en la pantalla
+    def setDibujo(self, dibujo):
+        self.dibujo = dibujo
 
 
 class Via:

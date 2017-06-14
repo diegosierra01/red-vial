@@ -4,6 +4,7 @@
 import random
 import numpy as np
 import time
+import sys
 
 
 class Vehiculo:
@@ -12,8 +13,11 @@ class Vehiculo:
     # toma de desiciones
     dibujo = None  # Es la referencia del dibujo que pertenece a esta particula en el canvas
 
-    def __init__(self, origen, destino, vehiculos, anchoVentana, altoVentana, vertices, ventana):
-        self.height = random.randrange(30, 80)
+    def __init__(self, estado, origen, destino, vehiculos, anchoVentana, altoVentana, vertices, ventana, peatones):
+        # pequeño mediano grande
+        self.peatones = peatones
+        self.estado = estado
+        self.height = random.randrange(30, 90, 20)
         self.width = 20
         self.ventana = ventana
         # provisional para dar una ruta al vehiculo
@@ -32,6 +36,9 @@ class Vehiculo:
 
     def reaccionar(self):
         while(True):
+            if self.estado == 1:
+                print "SIMULACION TERMINADA"
+                sys.exit()
             # si el vehiculo sigue en la via o si se encuentra en una interseccion
             if self.verificiarContencion(self.distanciaPrudente) is False:
                 self.tiempo = self.tiempo + 1
@@ -51,21 +58,24 @@ class Vehiculo:
 
     def verficarLlegada(self):
         if self.actual != self.destino:
-<<<<<<< HEAD
-            if self.girar() is True:
-                self.setVia(self.ventana.buscarVia(self.actual, self.vertices[self.recorrido]))
+            via = self.ventana.seleccionarDestino(self.actual, self.via)
+            if self.girar(self.obtenerProximoVertice(via)) is True:
+                self.setVia(via)
                 self.recorrido = self.recorrido + 1
-=======
-            self.setVia(self.ventana.seleccionarDestino(self.actual))
-            self.recorrido = self.recorrido + 1
->>>>>>> 5f9f6d405e0f7797ac694386eaa4a5656605d24a
             self.mover()
         else:
             self.setVelocidad()
             self.mover()
             if self.llegada is False:
-                print self.tiempo
+                self.color = "#000000"
+                print "Llegada: " + str(self.tiempo) + "segundos"
                 self.llegada = True
+
+    def obtenerProximoVertice(self, via):
+        if self.actual == via.inicio:
+            return via.fin
+        elif self.actual == via.fin:
+            return via.inicio
 
     def setVia(self, via):
         self.via = via
@@ -93,54 +103,56 @@ class Vehiculo:
         elif self.via.posicion == 2:
             self.distanciaPrudente = self.velocidad[1] * 5
 
-    def girar(self):
+    def girar(self, verticeproximo):
         # se busca la interseccion del vertice actual
         interseccion = self.ventana.buscarInterseccion(self.actual)
-        # si el vehiculo se sale de la interseccion pasa a otra via
-        if self.verificiarContencion(0):
-            # se comparan los dos vertices, el actual y el proximo
-            # noroccidente->50 nororiente->130
-            # suroriente->230 suroccidente->310
-            self.velocidad = np.array([1, 1])
-            if self.via.posicion == 1:
-                if self.actual.position['y'] > self.vertices[self.recorrido].position['y']:
-                    if self.sentido == 1:
-                        # nororiente
-                        self.angle = 130
-                        self.velocidad[1] = -1
-                    else:
-                        # noroccidente
-                        self.angle = 50
-                elif self.actual.position['y'] < self.vertices[self.recorrido].position['y']:
-                    if self.sentido == 1:
-                        # suroriente
-                        self.angle = 230
-                    else:
-                        # suroccidente
-                        self.angle = 310
-                        self.velocidad[1] = -1
-            elif self.via.posicion == 2:
-                if self.actual.position['x'] > self.vertices[self.recorrido].position['x']:
-                    if self.sentido == 1:
-                        # suroccidente
-                        self.angle = 310
-                        self.velocidad[0] = -1
-                    else:
-                        # noroccidente
-                        self.angle = 50
-                elif self.actual.position['x'] < self.vertices[self.recorrido].position['x']:
-                    if self.sentido == 1:
-                        # suroriente
-                        self.angle = 230
-                    else:
-                        # nororiente
-                        self.angle = 130
-                        self.velocidad[0] = -1
-        # si el vehiculo se sale de la interseccion pasa a otra via
-        if self.sentido == 1 and (self.posicion[0] > interseccion.coordenadas['x1'] or self.posicion[1] > interseccion.coordenadas['y1']):
-            return True
-        if self.sentido == 2 and (self.posicion[0] < interseccion.coordenadas['x2'] or self.posicion[1] < interseccion.coordenadas['y2']):
-            return True
+        if interseccion is not None:
+            self.mover()
+            # si el vehiculo se sale de la interseccion pasa a otra via
+            if self.verificiarContencion(0):
+                # se comparan los dos vertices, el actual y el proximo
+                # noroccidente->50 nororiente->130
+                # suroriente->230 suroccidente->310
+                self.velocidad = np.array([1, 1])
+                if self.via.posicion == 1:
+                    if self.actual.position['y'] > verticeproximo.position['y']:
+                        if self.sentido == 1:
+                            # nororiente
+                            self.angle = 130
+                            self.velocidad[1] = -1
+                        else:
+                            # noroccidente
+                            self.angle = 50
+                    elif self.actual.position['y'] < verticeproximo.position['y']:
+                        if self.sentido == 1:
+                            # suroriente
+                            self.angle = 230
+                        else:
+                            # suroccidente
+                            self.angle = 310
+                            self.velocidad[1] = -1
+                elif self.via.posicion == 2:
+                    if self.actual.position['x'] > verticeproximo.position['x']:
+                        if self.sentido == 1:
+                            # suroccidente
+                            self.angle = 310
+                            self.velocidad[0] = -1
+                        else:
+                            # noroccidente
+                            self.angle = 50
+                    elif self.actual.position['x'] < verticeproximo.position['x']:
+                        if self.sentido == 1:
+                            # suroriente
+                            self.angle = 230
+                        else:
+                            # nororiente
+                            self.angle = 130
+                            self.velocidad[0] = -1
+            # si el vehiculo se sale de la interseccion pasa a otra via
+            if self.sentido == 1 and (self.posicion[0] > interseccion.coordenadas['x1'] or self.posicion[1] > interseccion.coordenadas['y1']):
+                return True
+            if self.sentido == 2 and (self.posicion[0] < interseccion.coordenadas['x2'] or self.posicion[1] < interseccion.coordenadas['y2']):
+                return True
         return False
 
     def setSentido(self):
@@ -171,12 +183,12 @@ class Vehiculo:
 
     def mover(self):
         adelante, velocidad = self.verificarAdelante()
-        if adelante is False:  # hay un veliculo adelante
+        if adelante is False or self.verificarPeatones is False:  # hay un veliculo adelante
             if self.verificarLateral() is True:  # hay un vehiculo en el otro carril
                 self.frenar(velocidad)
             else:
                 self.cambiarCarril()
-        else:
+        elif self.verificarPeatones is True:
             # self.acelerar()
             if (self.via.posicion == 1 and self.velocidad[0] == 0) or (self.via.posicion == 2 and self.velocidad[1] == 0):
                 self.setVelocidad()
@@ -290,6 +302,23 @@ class Vehiculo:
                 if distancia <= self.distanciaPrudente and distancia > -1 * self.height:
                     return False, vehiculo.velocidad
         return True, 0
+
+    def verificarPeatones(self):
+        for peaton in self.peatones:
+            print "entro"
+            if self.sentido == 1:
+                if self.via.posicion == 1:
+                    distancia = (peaton.x - (self.posicion[0] + self.height))
+                else:
+                    distancia = (peaton.y - (self.posicion[1] + self.height))
+            else:
+                if self.via.posicion == 1:
+                    distancia = (self.posicion[0] - peaton.x)
+                else:
+                    distancia = (self.posicion[1] - peaton.y)
+            if distancia <= self.distanciaPrudente and distancia > -1 * self.height:
+                return False
+        return True
 
     def verificarLateral(self):
         resultado = False
