@@ -51,9 +51,14 @@ class Vehiculo:
 
     def verficarLlegada(self):
         if self.actual != self.destino:
+<<<<<<< HEAD
             if self.girar() is True:
                 self.setVia(self.ventana.buscarVia(self.actual, self.vertices[self.recorrido]))
                 self.recorrido = self.recorrido + 1
+=======
+            self.setVia(self.ventana.seleccionarDestino(self.actual))
+            self.recorrido = self.recorrido + 1
+>>>>>>> 5f9f6d405e0f7797ac694386eaa4a5656605d24a
             self.mover()
         else:
             self.setVelocidad()

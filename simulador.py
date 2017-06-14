@@ -41,11 +41,14 @@ class Simulador:
     def generar(self, cantidadParticulas=50):
         self.vehiculos = []
         for i in xrange(0, cantidadParticulas):
-            origen = self.ventana.gui.vertices.vertices[0]
+            #origen = self.ventana.gui.vertices.vertices[0]
+            
+            origen = self.seleccionarOrigen()
+
             destino = self.ventana.gui.vertices.vertices[len(self.ventana.gui.vertices.vertices) - 1]
             vehiculo = Vehiculo(origen, destino, self.vehiculos, self.anchoVentana, self.alturaVentana, self.ventana.gui.vertices.vertices, self.ventana)
             # self.ventana.vias[random.randrange(0, len(self.ventana.vias))]
-            vehiculo.setVia(self.ventana.buscarVia(vehiculo.actual, self.ventana.gui.vertices.vertices[vehiculo.recorrido]))
+            vehiculo.setVia(self.ventana.seleccionarDestino(origen))
             vehiculo.recorrido = vehiculo.recorrido + 1
             hiloVerificador = threading.Thread(target=vehiculo.reaccionar)
             hiloVerificador.daemon = True
@@ -54,6 +57,18 @@ class Simulador:
             espera = np.random.uniform(0.1, 5)
             time.sleep(espera)
             pass
+
+    
+       # if origen == via.inicio:
+       #     return via.fin
+       # else:
+       #     return via.iniciio
+
+    def seleccionarOrigen(self):
+        origenes = self.ventana.gui.origenes
+        cantidadOrigenes = len(origenes)
+        index = random.randrange(0, cantidadOrigenes)
+        return origenes[index]
 
     # ....Hilo.....
     def moverParticulas(self):

@@ -148,6 +148,26 @@ class Ventana:
         return None
 
 
+    def buscarVias(self, vertice):
+        resultado = []
+        print vertice
+        print ""
+        for via in self.vias:
+            if (via.inicio == vertice or via.fin == vertice):
+                print "encontrada"
+                resultado.append(via)
+        
+        return resultado
+
+    def seleccionarDestino(self, origen):
+        vias = self.buscarVias(origen)
+        
+        index = random.randrange(0, len(vias))
+
+        via = vias[index]
+        return via
+
+
 class Via:
 
     def __init__(self, lineaDivision):

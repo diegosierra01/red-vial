@@ -38,6 +38,7 @@ class Arista:
         self.vertice2 = vertice2
         self.calcularDistancia()
         self.calcularAngulo()
+        self.definirOrientacion()
 
     def calcularDistancia(self):
         self.distancia = math.sqrt(pow((self.vertice2.position['x'] - self.vertice1.position['x']), 2) + pow((self.vertice2.position['y'] - self.vertice1.position['y']), 2))
@@ -53,3 +54,30 @@ class Arista:
 
         #print self.angulo * (180.0 / math.pi)
 
+    def definirOrientacion(self):
+        self.anguloGrados = self.angulo * (180.0 / math.pi)
+        if self.anguloGrados == 0:
+            self.orientacion = 'oeste'
+            return
+        if self.anguloGrados == 90:
+            self.orientacion = 'norte'
+            return
+        if self.anguloGrados == 180:
+            self.orientacion = 'este'
+            return
+        if self.anguloGrados == -90:
+            self.orientacion = 'sur'
+            return
+
+        if 0 < self.anguloGrados < 90:
+            self.orientacion = 'noroeste'
+            return
+        if 90 < self.anguloGrados < 180:
+            self.orientacion = 'noreste'
+            return
+        if -90 > self.anguloGrados > -180:
+            self.orientacion = 'sureste'
+            return
+        if 0 >= self.anguloGrados >= -90:
+            self.orientacion = 'suroeste'
+            return
