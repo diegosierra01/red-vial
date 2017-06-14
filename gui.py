@@ -52,11 +52,19 @@ class Gui:
 
 
     def seleccionarOrigen(self, x, y):
+        i = 0
         for dibujo in self.dibujos:
             if (self.estaRangoCirculo(x, y, dibujo)):
-                origenes.append({'x': x, 'y':y})
+
+                #position = {'x': x, 'y':y}
+                #vertice = Vertice((len(self.vertices)), position)
+                print i
+                vertice = self.vertices.vertices[i]
+                self.origenes.append(vertice)
+
                 self.dibujarCuadrado(dibujo)
                 # self.agregarVertice({'x':evento.x, 'y':evento.y})
+                i = i +1
                 break  # Para que ya no revise mas
 
     def dibujarCuadrado(self, dibujo):
